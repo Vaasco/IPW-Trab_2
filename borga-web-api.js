@@ -5,6 +5,41 @@ const express = require('express');
 
 module.exports = function (services){
 
+
+    function getMostPopularGames(req, res){
+        res.json({response: "GET MOST POPULAR IDS", query:req.query})
+    }
+
+    function getGameByName(req, res){
+        
+    }
+
+    function getMyGroups(req, res){
+        
+    }
+
+    function addGameByName(req, res){
+        
+    }
+
+    function editGroup(req, res){
+        
+    }
+    
+    
+
+    function deleteGroupByName(req, res){
+
+    }
+    
+    function getGroupDetails(req,res){
+        
+    }
+
+    function deleteGameByName(req, res){
+        
+    }
+    
     const router = express.Router()
 
     router.use(express.json());
