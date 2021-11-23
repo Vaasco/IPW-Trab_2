@@ -8,11 +8,11 @@ module.exports = function (services){
         try{
             return await block(req, res)
         }catch(err){
-            onError(req, res, err)
+            onError(res, err)
         }
     }
 
-    function onError(req, res, err) {
+    function onError(res, err) {
 		switch (err.name) {
 			case 'NOT_FOUND': 
 				res.status(404);
@@ -24,23 +24,28 @@ module.exports = function (services){
                 res.status(400);
                 break;
 			case 'INVALID_PARAM': 
-				res.status(400); // Tirem la o ocupado e vejam o disc
+				res.status(400);
 				break;
 			default:
 				res.status(500);				
 		}
+        console.log('[ERROR]', err);
 		res.json({ cause: err });
 	}
 
     async function getMostPopularGames(req, res){
-        return await runCatching(req, res, async (req, res) => {
+        return await runCatching(req, res, async (_, res) => {
             const games = await services.getPopularGames()
             res.json(games)
         })
     }
 
-    function getGameByName(req, res){
-        
+    async function getGameByName(req, res){
+        return await runCatching(req, res, async(req, res) =>{
+            const gameName = req.params.gameName 
+            const game = await services.getGameWithName(gameName)
+            res.json(game)        
+        })
     }
 
     function getMyGroups(req, res){

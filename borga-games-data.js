@@ -88,7 +88,7 @@ function makeGameObj(gameInfo){
 }
 
 /**
- * Fetches the 10 most popular games by borga rank
+ * Fetches from the given uri the 10 most popular games by borga rank
  */
 async function findPopularGames(){
     return do_fetch(GAMES_BASE_URI+"order_by=rank&limit=10&ascending=false"+CLIENT_QUERY)
@@ -97,6 +97,19 @@ async function findPopularGames(){
         })
 }
 
-module.exports = {
-    findPopularGames: findPopularGames
+/**
+ * Fetches from the given uri the game with the respective name
+ */
+async function findGameByName(gameName){
+    return do_fetch(GAMES_BASE_URI+`name=${gameName}`+CLIENT_QUERY)
+    .then(answer => {
+        console.log(answer)
+        return makeGameObj(answer.games[0])
+    })
 }
+
+module.exports = {
+    findPopularGames: findPopularGames,
+    findGameByName: findGameByName
+}
+

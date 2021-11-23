@@ -9,10 +9,15 @@ module.exports = (games_data, data_mem) => {
            return {popularGames}     
         } 
 
+        async function getGameWithName(gameName){
+           const game = await games_data.findGameByName(gameName)    
+           return {game} 
+        }
 
         
         return {
-                getPopularGames: getPopularGames
+                getPopularGames: getPopularGames,
+                getGameWithName: getGameWithName
         }
 
 }
