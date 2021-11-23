@@ -1,13 +1,42 @@
-
 'use strict'
 
 const express = require('express');
 
 module.exports = function (services){
 
+    async function runCatching(req, res, block){
+        try{
+            return await block(req, res)
+        }catch(err){
+            onError(req, res, err)
+        }
+    }
 
-    function getMostPopularGames(req, res){
-        res.json({response: "GET MOST POPULAR IDS", query:req.query})
+    function onError(req, res, err) {
+		switch (err.name) {
+			case 'NOT_FOUND': 
+				res.status(404);
+				break;
+			case 'EXT_SVC_FAIL':
+				res.status(502);
+				break;
+			case 'MISSING_PARAM': 
+                res.status(400);
+                break;
+			case 'INVALID_PARAM': 
+				res.status(400); // Tirem la o ocupado e vejam o disc
+				break;
+			default:
+				res.status(500);				
+		}
+		res.json({ cause: err });
+	}
+
+    async function getMostPopularGames(req, res){
+        return await runCatching(req, res, async (req, res) => {
+            const games = await services.getPopularGames()
+            res.json(games)
+        })
     }
 
     function getGameByName(req, res){
@@ -25,7 +54,6 @@ module.exports = function (services){
     function editGroup(req, res){
         
     }
-    
     
 
     function deleteGroupByName(req, res){
