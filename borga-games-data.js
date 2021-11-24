@@ -103,7 +103,6 @@ async function findPopularGames(){
 async function findGameByName(gameName){
     return do_fetch(GAMES_BASE_URI+`name=${gameName}`+CLIENT_QUERY)
     .then(answer => {
-        console.log(answer)
         return makeGameObj(answer.games[0])
     })
 }

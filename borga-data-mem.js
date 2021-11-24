@@ -1,43 +1,40 @@
-/*'use strict'
+'use strict'
 
-const errors = require('./borga-errors');
+const errors = require('./borga-errors.js');
 
-const games = {};
+const users = {groups: {}}
 
-const hasGame = async(gameId) => !!games[gameId];
+const gameCollection = {games: []}
 
-async function saveGame(gameObj){
-    const gamesId = gamesObj.id
-    games[gamesId] = gamesObj
-    return gamesId 
+async function createNewGroup(groupName, groupDescription){
+    // Erro se o grupo já existir TODO #1
+    users.groups[groupName] = {
+                name: groupName, 
+                description: groupDescription,
+                gameNames: []
+            }
+    
+    return users.groups
 }
 
-async function loadGame(gameId){
-    const gameObj = games[gameId]
-    if(!gamesObj) {
-        const err = errors.NOT_FOUND({id: gameId})
-        throw err
+async function getGroups(){
+    return users.groups
+}
+
+async function editGroup(groupName, givenName, newDescription){
+    const desc = newDescription ? newDescription : users.groups[groupName].description 
+    const newName = givenName ? givenName : groupName   
+    users.groups[newName] = {
+        name: newName,
+        description: desc,
+        gameNames: users.groups[groupName].gameNames
     }
-    return gamesObj
-}
-
-async function deleteGame(gameId){
-    const gamesId = game[gamesId]
-    if(!gameObj){
-        throw errors.NOT_FOUND({id: gamesId})
-    }
-    delete games[gamesId]
-    return gamesId
-}
-
-async function listGames(){
-    return Object.values(games)
+    delete users.groups[groupName]
+    return users.groups  
 }
 
 module.exports = {
-    hasGame,
-    saveGame,
-    loadGame,
-    deleteGame,
-    listGames
-}*/
+    createNewGroup: createNewGroup,
+    getGroups: getGroups,
+    editGroup: editGroup
+}

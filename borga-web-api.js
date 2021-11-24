@@ -48,16 +48,31 @@ module.exports = function (services){
         })
     }
 
-    function getMyGroups(req, res){
-        
+    async function addGroup(req, res){
+        return await runCatching(req, res, async(req, res) =>{
+            const body = req.body
+            const group = await services.createNewGroup(body.groupName, body.groupDescription)
+            res.json(group)
+        })
+    }
+
+    async function getMyGroups(req, res){
+        return await runCatching(req, res, async(_,res) =>{
+            const groups = await services.getMyGroups()
+            res.json(groups)
+        })
     }
 
     function addGameByName(req, res){
         
     }
 
-    function editGroup(req, res){
-        
+    async function editGroup(req, res){
+        return await runCatching(req,res,async(req,res) =>{
+            const body = req.body
+            const newGroups = await services.editMyGroup(body.groupName, body.newGroupName, body.groupDescription)
+            res.json(newGroups)
+        })
     }
     
 
@@ -83,8 +98,13 @@ module.exports = function (services){
 
     // Resource /my/groups
     router.get("/my/groups", getMyGroups)
-    router.post("/my/groups", addGameByName)
-    router.post("/my/groups", editGroup)
+    router.post("/my/groups", addGroup)
+
+    // Resource /my/groups
+    router.post("/my/groups/edit", editGroup)
+
+    // Resource /my/groups/game
+    router.post("/my/groups/game", addGameByName)
 
     // Resource /my/groups/<groupName>
     router.get("/my/groups/:groupName", getGroupDetails)

@@ -13,11 +13,12 @@ module.exports = (games_data, data_mem) => {
            const game = await games_data.findGameByName(gameName)    
            return {game} 
         }
-
         
         return {
                 getPopularGames: getPopularGames,
-                getGameWithName: getGameWithName
+                getGameWithName: getGameWithName,
+                createNewGroup: data_mem.createNewGroup,
+                getMyGroups: data_mem.getGroups,
+                editMyGroup: data_mem.editGroup
         }
-
 }
