@@ -4,10 +4,11 @@ const express = require('express');
 
 module.exports = function (services){
 
-    async function runCatching(req, res, block){
+    async function runCatching(block){
         try{
-            return await block(req, res)
+            return await block()
         }catch(err){
+            console.log(err)
             onError(res, err)
         }
     }
@@ -33,15 +34,15 @@ module.exports = function (services){
 		res.json({ cause: err });
 	}
 
-    async function getMostPopularGames(req, res){
-        return await runCatching(req, res, async (_, res) => {
+    async function getMostPopularGames(_, res){
+        return await runCatching(async () => {
             const games = await services.getPopularGames()
             res.json(games)
         })
     }
 
     async function getGameByName(req, res){
-        return await runCatching(req, res, async(req, res) =>{
+        return await runCatching(async() =>{
             const gameName = req.params.gameName 
             const game = await services.getGameWithName(gameName)
             res.json(game)        
@@ -49,26 +50,30 @@ module.exports = function (services){
     }
 
     async function addGroup(req, res){
-        return await runCatching(req, res, async(req, res) =>{
+        return await runCatching(async() =>{
             const body = req.body
             const group = await services.createNewGroup(body.groupName, body.groupDescription)
             res.json(group)
         })
     }
 
-    async function getMyGroups(req, res){
-        return await runCatching(req, res, async(_,res) =>{
+    async function getMyGroups(_, res){
+        return await runCatching( async() =>{
             const groups = await services.getMyGroups()
             res.json(groups)
         })
     }
 
-    function addGameByName(req, res){
-        
+    async function addGameByName(req, res){
+        return await runCatching(async() =>{
+            const body = req.body
+            const added = await services.addGameToGroup(body.groupName, body.gameName)
+            res.json(added)
+        })
     }
 
     async function editGroup(req, res){
-        return await runCatching(req,res,async(req,res) =>{
+        return await runCatching(async() =>{
             const body = req.body
             const newGroups = await services.editMyGroup(body.groupName, body.newGroupName, body.groupDescription)
             res.json(newGroups)
@@ -76,16 +81,28 @@ module.exports = function (services){
     }
     
 
-    function deleteGroupByName(req, res){
-
+    async function deleteGroupByName(req, res){
+        return await runCatching(async() => {
+            const groupName = req.params.groupName
+            const deleted = await services.deleteGroup(groupName)
+            res.json(deleted)
+        })
     }
     
-    function getGroupDetails(req,res){
-        
+    async function getGroupDetails(req,res){
+        return await runCatching(async() => {
+            const groupName = req.params.groupName
+            const group = await services.getDetails(groupName)
+            res.json(group)
+        })
     }
 
-    function deleteGameByName(req, res){
-        
+    async function deleteGameByName(req, res){
+        return await runCatching(async() => {
+            const params = req.params
+            const deletedGame = await services.deleteGameByName(params.groupName,params.gameName)
+            res.json(deletedGame)
+        })
     }
     
     const router = express.Router()

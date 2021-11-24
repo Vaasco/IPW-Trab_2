@@ -9,7 +9,7 @@ const fetch = require('node-fetch')
 /**
  * 
  */
-const ATLAS_BORGA_ID = process.env.ATLAS_BORGA_ID
+const ATLAS_BORGA_ID = process.env.ATLAS_CLIENT_ID
 const GAMES_BASE_URI = "https://api.boardgameatlas.com/api/search?"
 const CLIENT_QUERY = `&client_id=${ATLAS_BORGA_ID}`
 const HTTP_SERVER_ERROR = 5;
@@ -26,7 +26,7 @@ function getStatusClass(statusCode) {
  * Starts the process of fetching a resource from the network, 
  * returning a promise which is fulfilled once the response is available.
  */
-function do_fetch(uri){
+async function do_fetch(uri){
     return fetch(uri)
         .catch(err => { throw EXT_SVC_FAIL(err) })
         .then(res => {
