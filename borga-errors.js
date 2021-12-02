@@ -5,7 +5,7 @@ function buildErrorList(){
 
     function addError(code,name,message){
         errors[name] = info => {
-            return {code,name, message,info};
+            return {code, name, message, info};
         };
     }
 

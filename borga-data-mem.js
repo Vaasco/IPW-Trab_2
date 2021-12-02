@@ -1,8 +1,17 @@
 'use strict'
+const crypto = require('crypto')
 
 const errors = require('./borga-errors.js');
-const users = {}
-const tokens = {}
+const users = {
+    'costakilapada': {groups: {}},
+    'jsmagician': {groups: {}},
+    'vascao': {groups: {}}
+}
+const tokens = { 
+    'abd331d7-fd48-4054-9b73-7b7edf2941a6': 'costakilapada',
+    '255f06fe-46b9-44b9-ba5a-6acdf72347b9': 'vascao',
+    '84ea5f5b-8e03-421b-8edb-16a0ae89eb7f': 'jsmagician'     
+}
 const gameCollection = {games: {}}
 
 /**
@@ -10,7 +19,9 @@ const gameCollection = {games: {}}
  */
 async function createNewUser(name){
     tokens[crypto.randomUUID()] = name
-    users[name][groups] = {}
+    users[name] = {groups: {}}
+    console.log(tokens)
+    return true
 }
 
 async function addGameToCollection(game){
@@ -110,5 +121,7 @@ module.exports = {
     getGame: getGame,
     addGameToCollection: addGameToCollection,
     addGameToGroup: addGameToGroup,
-    deleteGameByName, deleteGameByName
+    deleteGameByName: deleteGameByName,
+    createNewUser: createNewUser,
+    tokenToUsername: tokenToUsername
 }

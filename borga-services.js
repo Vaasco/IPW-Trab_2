@@ -1,6 +1,5 @@
 'use strict'
-
-//const require
+const errors = require('./borga-errors.js');
 
 module.exports = (games_data, data_mem) => {
 
@@ -62,7 +61,7 @@ module.exports = (games_data, data_mem) => {
 
     async function deleteGameByName(groupName, gameName, token){
         const userName = await getUsername(token)
-        return await data_mem.deleteGroup(groupName, gameName, userName)
+        return await data_mem.deleteGameByName(groupName, gameName, userName)
     }
     
     return {
@@ -74,6 +73,7 @@ module.exports = (games_data, data_mem) => {
         editMyGroup: editGroup,
         getDetails: groupDetails,
         deleteGroup: deleteGroup,
-        deleteGameByName: data_mem.deleteGameByName
+        deleteGameByName: deleteGameByName,
+        createNewUser: data_mem.createNewUser
     }
 }

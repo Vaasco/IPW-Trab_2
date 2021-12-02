@@ -4,8 +4,8 @@ const express = require('express');
 /**
  * Novo
  */
-const openApiUi = require('swagger-ui-express');
-const openApiSpec = require('./docs/aliche-spec.json');
+//const openApiUi = require('swagger-ui-express');
+//const openApiSpec = require('./docs/aliche-spec.json');
 
 module.exports = function (services){
 
@@ -60,84 +60,117 @@ module.exports = function (services){
 	}
 
     async function getMostPopularGames(_, res){
-        return await runCatching(async () => {
+        try{
             const games = await services.getPopularGames()
             res.json(games)
-        })
+        }catch(err){
+            onError(res,err)
+        }
     }
 
     async function getGameByName(req, res){
-        return await runCatching(async() =>{
+        try{
             const gameName = req.params.gameName 
             const game = await services.getGameWithName(gameName)
-            res.json(game)        
-        })
+            res.json(game)   
+        }
+        catch(err){
+            onError(res,err)
+        }
     }
 
     async function addGroup(req, res){
-        return await runCatching(async() =>{
+        try{
             const body = req.body
             const group = await services.createNewGroup(body.groupName, body.groupDescription, getBearerToken(req))
-            res.json(group)
-        })
+            res.json(group) 
+        }
+        catch(err){
+            onError(res,err)
+        }
     }
 
-    async function getMyGroups(_, res){
-        return await runCatching( async() =>{
-            const groups = await services.getMyGroups()
+    async function getMyGroups(req, res){
+        try{
+            const groups = await services.getMyGroups(getBearerToken(req))
             res.json(groups)
-        })
+        }
+        catch(err){
+            onError(res,err)
+        }
     }
 
     async function addGameByName(req, res){
-        return await runCatching(async() =>{
+        try{
             const body = req.body
             const added = await services.addGameToGroup(body.groupName, body.gameName, getBearerToken(req))
             res.json(added)
-        })
+        }
+        catch(err){
+            onError(res,err)
+        }
     }
 
     async function editGroup(req, res){
-        return await runCatching(async() =>{
+        try{
             const body = req.body
             const newGroups = await services.editMyGroup(body.groupName, body.newGroupName
                 , body.groupDescription
                 ,getBearerToken(req)
                 )
-            res.json(newGroups)
-        })
+            res.json(newGroups) 
+        }
+        catch(err){
+            onError(res,err)
+        }
     }
     
 
     async function deleteGroupByName(req, res){
-        return await runCatching(async() => {
+        try{
             const groupName = req.params.groupName
             const deleted = await services.deleteGroup(groupName, getBearerToken(req))
             res.json(deleted)
-        })
+        }catch(err){
+            onError(res, err)
+        }
     }
     
     async function getGroupDetails(req,res){
-        return await runCatching(async() => {
+        try{
             const groupName = req.params.groupName
             const group = await services.getDetails(groupName, getBearerToken(req))
             res.json(group)
-        })
+        }catch(err){
+            onError(res, err)
+        }
     }
 
     async function deleteGameByName(req, res){
-        return await runCatching(async() => {
+        try{
             const params = req.params
             const deletedGame = await services.deleteGameByName(params.groupName,params.gameName, getBearerToken(req))
             res.json(deletedGame)
-        })
+        }catch(err){
+            onError(res, err)
+        }
+    }
+
+    async function createNewUser(req,res){
+        try{
+            const userName = req.body.userName
+            const newUser = await services.createNewUser(userName)
+            res.json(newUser)        
+        }catch(err){
+            onError(res, err)
+        }
     }
     
     /**
      * Novo
      */
-    router.use('/docs', openApiUi.serve);
-	router.get('/docs', openApiUi.setup(openApiSpec));
+    //router.use('/docs', openApiUi.serve);
+	//router.get('/docs', openApiUi.setup(openApiSpec));
 
     const router = express.Router()
 
@@ -146,7 +179,9 @@ module.exports = function (services){
     router.get("/global/popular", getMostPopularGames)
     router.get("/global/:gameName", getGameByName)
     
-
+    //Resource /register
+    router.post("/register", createNewUser)
+    
     // Resource /my/groups
     router.get("/my/groups", getMyGroups)
     router.post("/my/groups", addGroup)

@@ -5,7 +5,7 @@
  */
 require("dotenv").config()
 const fetch = require('node-fetch')
-
+const errors = require('./borga-errors.js');
 /**
  * 
  */
@@ -32,7 +32,7 @@ async function do_fetch(uri){
         .then(res => {
             if(res.ok){
                 return res.json()
-            }else {b
+            }else {
                 if(res.status === 404){
                     throw errors.NOT_FOUND(uri)
                 }
