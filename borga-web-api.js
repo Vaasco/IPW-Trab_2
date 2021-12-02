@@ -1,8 +1,27 @@
 'use strict'
 
 const express = require('express');
+/**
+ * Novo
+ */
+const openApiUi = require('swagger-ui-express');
+const openApiSpec = require('./docs/aliche-spec.json');
 
 module.exports = function (services){
+
+    /**
+     * Novo
+     */
+    function getBearerToken(req) {
+		const auth = req.header('Authorization');
+		if (auth) {
+			const authData = auth.trim();
+			if (authData.substr(0,6).toLowerCase() === 'bearer') {
+				return authData.replace(/^bearer\s+/i, '');
+			}
+		}
+		return null;
+	}
 
     async function runCatching(block){
         try{
@@ -27,6 +46,12 @@ module.exports = function (services){
 			case 'INVALID_PARAM': 
 				res.status(400);
 				break;
+            /**
+             * Novo 
+             */    
+            case 'UNAUTHENTICATED': 
+				res.status(401);
+			break;    
 			default:
 				res.status(500);				
 		}
@@ -52,7 +77,7 @@ module.exports = function (services){
     async function addGroup(req, res){
         return await runCatching(async() =>{
             const body = req.body
-            const group = await services.createNewGroup(body.groupName, body.groupDescription)
+            const group = await services.createNewGroup(body.groupName, body.groupDescription, getBearerToken(req))
             res.json(group)
         })
     }
@@ -67,7 +92,7 @@ module.exports = function (services){
     async function addGameByName(req, res){
         return await runCatching(async() =>{
             const body = req.body
-            const added = await services.addGameToGroup(body.groupName, body.gameName)
+            const added = await services.addGameToGroup(body.groupName, body.gameName, getBearerToken(req))
             res.json(added)
         })
     }
@@ -75,7 +100,10 @@ module.exports = function (services){
     async function editGroup(req, res){
         return await runCatching(async() =>{
             const body = req.body
-            const newGroups = await services.editMyGroup(body.groupName, body.newGroupName, body.groupDescription)
+            const newGroups = await services.editMyGroup(body.groupName, body.newGroupName
+                , body.groupDescription
+                ,getBearerToken(req)
+                )
             res.json(newGroups)
         })
     }
@@ -84,7 +112,7 @@ module.exports = function (services){
     async function deleteGroupByName(req, res){
         return await runCatching(async() => {
             const groupName = req.params.groupName
-            const deleted = await services.deleteGroup(groupName)
+            const deleted = await services.deleteGroup(groupName, getBearerToken(req))
             res.json(deleted)
         })
     }
@@ -92,7 +120,7 @@ module.exports = function (services){
     async function getGroupDetails(req,res){
         return await runCatching(async() => {
             const groupName = req.params.groupName
-            const group = await services.getDetails(groupName)
+            const group = await services.getDetails(groupName, getBearerToken(req))
             res.json(group)
         })
     }
@@ -100,11 +128,17 @@ module.exports = function (services){
     async function deleteGameByName(req, res){
         return await runCatching(async() => {
             const params = req.params
-            const deletedGame = await services.deleteGameByName(params.groupName,params.gameName)
+            const deletedGame = await services.deleteGameByName(params.groupName,params.gameName, getBearerToken(req))
             res.json(deletedGame)
         })
     }
     
+    /**
+     * Novo
+     */
+    router.use('/docs', openApiUi.serve);
+	router.get('/docs', openApiUi.setup(openApiSpec));
+
     const router = express.Router()
 
     router.use(express.json());

@@ -32,7 +32,7 @@ async function do_fetch(uri){
         .then(res => {
             if(res.ok){
                 return res.json()
-            }else {
+            }else {b
                 if(res.status === 404){
                     throw errors.NOT_FOUND(uri)
                 }
@@ -78,7 +78,7 @@ function makeGameObj(gameInfo){
         min_players: gameInfo.min_players,
         max_players: gameInfo.max_players,
         min_age: gameInfo.min_age,
-        //description: gameInfo.description_preview,
+        //description: gameInfo.description_preview,                                       NAO ESQUECER DE DESCOMENTAR!!!!
         image_url: gameInfo.image_url,
         rules_url: gameInfo.rules_url,
         amazon_rank: gameInfo.amazon_rank,
