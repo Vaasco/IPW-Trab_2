@@ -7,7 +7,7 @@ require("dotenv").config()
 const fetch = require('node-fetch')
 const errors = require('./borga-errors.js');
 /**
- * 
+ *  
  */
 const ATLAS_BORGA_ID = process.env.ATLAS_CLIENT_ID
 const GAMES_BASE_URI = "https://api.boardgameatlas.com/api/search?"

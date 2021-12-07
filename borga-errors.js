@@ -1,8 +1,15 @@
 'use strict'
 
+
+/**
+ * Error collection builder
+ */
 function buildErrorList(){
     const errors = {};
 
+    /**
+     * Adds an error to the collection
+     */
     function addError(code,name,message){
         errors[name] = info => {
             return {code, name, message, info};
