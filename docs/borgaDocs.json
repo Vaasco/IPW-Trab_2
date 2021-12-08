@@ -1,0 +1,792 @@
+{
+    "openapi": "3.0.3",
+    "info": {
+        "title": "Borga Games",
+        "description": "IPW First Assignement API. Manage your game collection.",
+        "termsOfService": "http://swagger.io/terms/",
+        "servers": ["http://localhost:8888"]
+    },
+    "servers": [
+        {
+            "url": "http://localhost:8888/api",
+            "description": "Local Server"
+        }
+    ],
+    "tags":[
+        {
+            "name": "Global",
+            "description": "Request that can be done without authenticating."
+        },
+        {
+            "name": "User",
+            "description": "Request that can only be done while authenticated."
+        }  
+    ],
+    "paths": {
+        "/global/popular": {
+            "get": {
+                "tags": [
+                    "Global"
+                ],
+               "summary": "Gets the 10 most popular games.",
+               "responses": {
+                  "200": {
+                     "description": "If everything goes right.",
+                    "content":{
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/GameList"
+                            }
+                        }
+                    }
+                  },
+                  "502": {
+                    "description": "Board Game Atlas is not responding.",
+                    "content": {
+                      "application/json": {
+                        "schema": {
+                          "$ref": "#/components/schemas/AppError"
+                        }
+                      }
+                    }
+                  }
+               }
+            }
+         },
+         "/global/game/{gameName}": {
+            "get": {
+                "tags": [
+                    "Global"
+                ],
+                "summary": "Gets the game by name.",
+                "parameters": [
+                    {
+                        "name": "gameName",
+                        "in": "path",
+                        "required": true,
+                        "description": "Game's name to search for.",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "example": "Pandemic"
+                    }
+                 ],
+                "responses": {
+                    "200": {
+                       "description": "If everything goes right.",
+                      "content":{
+                          "application/json": {
+                              "schema": {
+                                  "$ref": "#/components/schemas/GameResponse"
+                              }
+                          }
+                      }
+                    },
+                    "502": {
+                        "description": "Board Game Atlas is not responding",
+                        "content": {
+                          "application/json": {
+                            "schema": {
+                              "$ref": "#/components/schemas/AppError"
+                            }
+                          }
+                        }
+                    },
+                    "404": {
+                        "description": "No game found with this name",
+                        "content": {
+                          "application/json": {
+                            "schema": {
+                              "$ref": "#/components/schemas/AppError"
+                            }
+                          }
+                        }
+                    }
+                }
+            }
+         },
+        "/register": {
+            "post": {
+                "tags":[
+                    "Global"
+                ],
+                "summary": "Creates a new user",
+                "requestBody": {
+                    "description": "Name of the user to register",
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/UserName"
+                            }
+                        }
+                    }
+                },
+                "responses":{
+                    "200": {
+                        "description": "The user is now registed",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/UserRegister"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid or missing username.",
+                        "content": {
+                          "application/json": {
+                            "schema": {
+                              "$ref": "#/components/schemas/AppError"
+                            }
+                          }
+                        }
+                    }
+                }          
+            }
+        },  
+        "/my/groups":{
+            "get":{
+                "summary": "Gets all the groups of an user's collection.",
+                "tags": [
+                    "User"
+                ],
+                "responses": {
+                    "200": {
+                       "description": "An Array with all of the groups as objects.",
+                        "content":{
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/GroupList"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Missing or Invalid API token. The user is not authenticated.",
+                        "content": {
+                          "application/json": {
+                            "schema": {
+                              "$ref": "#/components/schemas/AppError"
+                            }
+                          }
+                        }
+                    }
+                },
+                "security:": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "post":{
+                "tags": [
+                    "User"
+                ],
+                "summary": "Creates a new Game's Group.",
+                "requestBody":{
+                    "description": "Create group with a name and description",
+                    "required": true,
+                    "content":{
+                        "application/json":{
+                            "schema": {
+                                "$ref": "#/components/schemas/GroupCreator"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Group successfuly created",
+                        "content":{
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/GroupResponse"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Missing group name or group already exists.",
+                        "content": {
+                          "application/json": {
+                            "schema": {
+                              "$ref": "#/components/schemas/AppError"
+                            }
+                          }
+                        }
+                    },
+                    "401": {
+                        "description": "Missing or Invalid API token. The user is not authenticated.",
+                        "content": {
+                          "application/json": {
+                            "schema": {
+                              "$ref": "#/components/schemas/AppError"
+                            }
+                          }
+                        }
+                    }
+                }
+            }
+        },
+        "/my/groups/edit":{
+            "post":{
+                "tags": [
+                    "User"
+                ],
+                "summary": "Edits a group from an user's collection.",
+                "requestBody":{
+                    "description": "Group name to edit and the respective new group name and new description",
+                    "required": true,
+                    "content":{
+                        "application/json":{
+                            "schema": {
+                                "$ref": "#/components/schemas/GroupOperationResponse"
+                            }
+                        }
+                    }
+                },
+                "responses":{
+                    "200": {
+                        "description": "The group got succesfully edited",
+                        "content":{
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/GroupResponse"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid or missing group name to edit or missing new group name and new description.",
+                        "content": {
+                          "application/json": {
+                            "schema": {
+                              "$ref": "#/components/schemas/AppError"
+                            }
+                          }
+                        }
+                    },
+                    "401": {
+                        "description": "Missing or Invalid API token. The user is not authenticated.",
+                        "content": {
+                          "application/json": {
+                            "schema": {
+                              "$ref": "#/components/schemas/AppError"
+                            }
+                          }
+                        }
+                    }     
+                }
+            }
+        },
+        "/my/groups/game":{
+            "post":{
+                "tags": [
+                    "User"
+                ],
+                "summary": "Adds a game to a group.",
+                "requestBody":{
+                    "description": "Group and game names.",
+                    "required": true,
+                    "content":{
+                        "application/json":{
+                            "schema": {
+                                "$ref": "#/components/schemas/GameAddition"
+                            }
+                        }
+                    }
+                },
+                "responses":{
+                    "200": {
+                        "description": "The game is now in the group",
+                        "content": {
+                          "application/json": {
+                            "schema": {
+                              "$ref": "#/components/schemas/GameOperationResponse"
+                            }
+                          }
+                        }
+                      },
+                    "400": {
+                        "description": "Group or game name's missing.",
+                        "content": {
+                          "application/json": {
+                            "schema": {
+                              "$ref": "#/components/schemas/AppError"
+                            }
+                          }
+                        }
+                      },
+                    "401": {
+                        "description": "Missing or Invalid API token. The user is not authenticated.",
+                        "content": {
+                          "application/json": {
+                            "schema": {
+                              "$ref": "#/components/schemas/AppError"
+                            }
+                          }
+                        }
+                    }
+                }
+            }
+        },
+        "/my/groups/{groupName}":{
+            "get":{
+                "summary": "Gets a group of an user's collection.",
+                "security:": [
+                    {
+                        "bearerAuth": []
+                    }
+                ],
+                "tags": [
+                    "User"
+                ],
+                "parameters": [
+                    {
+                        "name": "groupName",
+                        "in": "path",
+                        "required": true,
+                        "description": "Group's name to search for.",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "example": "MyGames"
+                    }
+                 ],
+                "responses":{
+                    "200": {
+                        "description": "If everything goes right.",
+                       "content":{
+                           "application/json": {
+                               "schema": {
+                                   "$ref": "#/components/schemas/GroupResponse"
+                                 }
+                             }
+                         }
+                    },
+                    "400": {
+                        "description": "Inexistant Group in user's collection.",
+                        "content": {
+                          "application/json": {
+                            "schema": {
+                              "$ref": "#/components/schemas/AppError"
+                            }
+                          }
+                        }
+                    },
+                    "401": {
+                        "description": "Missing or Invalid API token. The user is not authenticated.",
+                        "content": {
+                          "application/json": {
+                            "schema": {
+                              "$ref": "#/components/schemas/AppError"
+                            }
+                          }
+                        }
+                    }
+                }       
+            },
+            "delete":{
+                "tags": [
+                    "User"
+                ],
+                "summary": "Deletes a group from a user's collection.",
+                "parameters":[
+                    {
+                        "name": "groupName",
+                        "in": "path",
+                        "required": true,
+                        "description": "Group to delete.",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "example": "MyGames"
+                    }
+                ],
+                "responses":{
+                    "200": {
+                        "description": "If everything goes right.",
+                       "content":{
+                           "application/json": {
+                               "schema": {
+                                   "$ref": "#/components/schemas/GroupNameResponse"
+                               }
+                           }
+                       }
+                     },
+                     "400":{
+                        "description": "Invalid group's name.",
+                        "content": {
+                          "application/json": {
+                            "schema": {
+                              "$ref": "#/components/schemas/AppError"
+                            }
+                          }
+                        }
+                    },
+                    "401": {
+                        "description": "Missing or Invalid API token. The user is not authenticated.",
+                        "content": {
+                          "application/json": {
+                            "schema": {
+                              "$ref": "#/components/schemas/AppError"
+                            }
+                          }
+                        }
+                    }
+                } 
+            }
+        },
+        "/my/groups/{groupName}/{gameName}":{
+            "delete":{
+                "tags": [
+                    "User"
+                ],
+                "summary": "Deletes a game from an user's collection group.",
+                "parameters": [
+                    {
+                        "name": "groupName",
+                        "in": "path",
+                        "required": true,
+                        "description": "Group's name that contains the game to delete.",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "example": "MyGames"
+                    },
+                    {
+                        "name": "gameName",
+                        "in": "path",
+                        "required": true,
+                        "description": "Game's name to delete.",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "example": "Pandemic"
+                    }
+                 ],
+                 "responses": {
+                    "200": {
+                       "description": "If everything goes right.",
+                      "content":{
+                          "application/json": {
+                              "schema": {
+                                  "$ref": "#/components/schemas/GameOperationResponse"
+                              }
+                          }
+                      }
+                    },
+                    "400":{
+                        "description": "Invalid group or game's name.",
+                        "content": {
+                          "application/json": {
+                            "schema": {
+                              "$ref": "#/components/schemas/AppError"
+                            }
+                          }
+                        }
+                    },
+                    "401": {
+                        "description": "Missing or Invalid API token. The user is not authenticated.",
+                        "content": {
+                          "application/json": {
+                            "schema": {
+                              "$ref": "#/components/schemas/AppError"
+                            }
+                          }
+                        }
+                    }
+                }    
+            }
+        }
+    },
+    "components": {
+        "securitySchemes": {
+            "bearerAuth": {
+                "type": "http",
+                "scheme": "bearer"
+            }
+        },
+        "schemas":{
+            "AppErrorInfo":{
+                "description": "Additional information about the error.",
+                "nullable": true,
+                "anyOf": [
+                    {
+                        "type": "object"
+                    },
+                    {
+                        "type": "string"
+                    },
+                    {
+                        "type": "integer"
+                    },
+                    {
+                        "type": "number"
+                    }
+                ],
+                "example": "Error ocurred."
+            },
+            "AppError": {
+                "type": "object",
+                "description": "Application error",
+                "required": [
+                "code",
+                "name",
+                "message"
+                ],
+                "properties": {
+                    "code": {
+                        "type": "number",
+                        "format": "int32",
+                        "description": "Internal error code",
+                        "example": 2000
+                    },
+                    "name": {
+                        "type": "string",
+                        "description": "Internal error name",
+                        "example": "FAIL"
+                    },
+                    "message": {
+                        "type": "string",
+                        "description": "Error description message",
+                        "example": "An error occurred"
+                    },
+                    "info": {
+                        "$ref": "#/components/schemas/AppErrorInfo"
+                    }
+                }
+            },
+            "GameOperationResponse": {
+                "type": "object",
+                "description": "Game operation completed successfully.",
+                "required": [
+                    "gameName"
+                ],
+                "properties": {
+                    "gameName": {
+                        "type": "string",
+                        "example": "Pandemic"
+                    }
+                }
+            },
+            "Game":{
+                "type": "object",
+                "description": "Game data",
+                "properties": {
+                    "id":{
+                        "type": "string",
+                        "description": "Board game atlas game's id.",
+                        "example": "j8LdPFmePE"
+                    },
+                    "url":{
+                        "type": "string",
+                        "description": "Board game atlas game's url.",
+                        "example": "https://www.boardgameatlas.com/game/j8LdPFmePE/7-wonders-duel"
+                    },
+                    "name":{
+                        "type": "string",
+                        "description": "Board game's name.",
+                        "example": "7 Wonders Duel"
+                    },
+                    "price":{
+                        "type": "string",
+                        "description": "Board game's price.",
+                        "example": "17.50"
+                    },
+                    "min_players":{
+                        "type": "int32",
+                        "description": "Board game minimum players required to play.",
+                        "example": 2
+                    },
+                    "max_players":{
+                        "type": "int32",
+                        "description": "Board game's maximum players required to play.",
+                        "example": 2
+                    },
+                    "min_age":{
+                        "type": "int32",
+                        "description": "Board game's minimum age required to play.",
+                        "example": 10
+                    },
+                    "description":{
+                        "type": "string",
+                        "description": "A preview of the description of the game",
+                        "example": "7 Wonders Duel  is a fast-paced, two-player edition of Antoine Bauza's award-winning civilization-building game."
+                    },
+                    "image_url":{
+                        "type": "string",
+                        "description": "Board game's image url",
+                        "example": "https://s3-us-west-1.amazonaws.com/5cc.images/games/uploaded/1629323024736.jpg"
+                    },
+                    "rules_url":{
+                        "type": "string",
+                        "description": "Board game's rules url",
+                        "example": "http://www.7wondersduel.com/files/rules/7-Wonders-Duel-Rules-US.pdf"
+                    },
+                    "amazon_rank":{
+                        "type": "int32",
+                        "description": "Board game's amazon rank",
+                        "example": 2763
+                    },
+                    "official_url": {
+                        "type": "string",
+                        "description": "Board game's official url",
+                        "example": "http://www.7wondersduel.com/7wonders-duel.php?utm_source=boardgameatlas.com&utm_medium=search&utm_campaign=bga_ads"
+                    },
+                    "borga_rank":{
+                        "type": "int32",
+                        "description": "Board game atlas game's rank",
+                        "example": 10
+                    }
+                }
+            },
+            "GameList": {
+                "type": "object",
+                "description": "Response with a list of games.",
+                "properties": {
+                    "games": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/Game"
+                        }
+                    }
+                }     
+            },
+            "GameResponse": {
+                "type": "object",
+                "description": "Response with a game",
+                "properties": {
+                    "game": {
+                        "$ref": "#/components/schemas/Game"
+                    }
+                }
+            },
+            "GameAddition": {
+              "type": "object",
+              "description": "Group name and game name.",
+              "properties": {
+                  "groupName": {
+                      "type": "string"
+                  },
+                  "gameName": {
+                      "type": "string"
+                  }
+              }  
+            },
+            "Group":{
+                "type": "object",
+                "description": "User's group",
+                "properties": {
+                    "name": {
+                        "type": "string",
+                        "description": "Game's name identifier.",
+                        "example": "MyGames"
+                    },
+                    "description": {
+                        "type": "string",
+                        "description": "Group's description.",
+                        "example": "Jogos que já joguei"
+                    },
+                    "gameNames":{
+                        "type": "array",
+                        "items":{
+                            "type": "string",
+                            "description": "Game's name identifier.",
+                            "example": "monopoly"
+                        }
+                    }
+                }
+            },
+            "GroupList":{
+                "type": "object",
+                "description": "User's group",
+                "properties": {
+                    "groups":{
+                        "type": "array",
+                        "items":{
+                            "$ref": "#/components/schemas/Group"
+                        }
+                    }
+                }
+            },
+            "GroupOperationResponse":{
+                "type": "object",
+                "description": "Game operation completed successfully.",
+                "required": [
+                    "groupName"
+                ],
+                "properties": {
+                    "gameName": {
+                        "type": "string"
+                    },
+                    "newGroupName":{
+                        "type": "string"
+                    },
+                    "newGroupDescription": {
+                        "type": "string"
+                    }
+                }
+            },
+            "GroupResponse":{
+                "type": "object",
+                "description": "Response with a group.",
+                "properties": {
+                    "group": {
+                        "$ref": "#/components/schemas/Group"
+                    }
+                }
+            },
+            "GroupCreator":{
+                "type": "object",
+                "description": "Object with a group name and description.",
+                "properties": {
+                    "groupName": {
+                        "type": "string",
+                        "example": "MyGames"
+                    },
+                    "groupDescription": {
+                        "type": "string",
+                        "example": "Jogos que já joguei"
+                    }
+                }
+            },  
+            "UserRegister":{
+                "type": "object",
+                "description": "Response with a user and his token",
+                "properties":{
+                    "userName": {
+                        "type": "string",
+                        "example": "User"
+                    },
+                    "token": {
+                        "type": "string",
+                        "example": "8e3e3f01-ba66-46ce-ba1a-88a6abad4d6d"
+                    }
+                }
+            },
+            "UserName":{
+                "type": "object",
+                "description": "Name of the user to register",
+                "properties":{
+                    "userName": {
+                        "type": "string",
+                        "example": "User"
+                    }
+                }
+            },
+            "GroupNameResponse":{
+                "type": "object",
+                "description": "Name of the deleted group",
+                "properties":{
+                    "groupName": {
+                        "type": "string",
+                        "example": "MyGames"
+                    }
+                }
+            }    
+        }    
+    }
+}

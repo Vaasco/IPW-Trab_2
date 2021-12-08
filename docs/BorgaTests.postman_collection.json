@@ -1,0 +1,381 @@
+{
+	"info": {
+		"_postman_id": "9aaf9e57-3ea8-4a5e-bc7e-cd2f58617901",
+		"name": "BorgaTests",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Authentication Not Required",
+			"item": [
+				{
+					"name": "Get most popular games",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{API_BASE_URL}}/global/popular",
+							"host": [
+								"{{API_BASE_URL}}"
+							],
+							"path": [
+								"global",
+								"popular"
+							]
+						},
+						"description": "Gets borga 10 most popular games"
+					},
+					"response": []
+				},
+				{
+					"name": "Get game by name (Pandemic)",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{API_BASE_URL}}/global/game/:gameName",
+							"host": [
+								"{{API_BASE_URL}}"
+							],
+							"path": [
+								"global",
+								"game",
+								":gameName"
+							],
+							"variable": [
+								{
+									"key": "gameName",
+									"value": null
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create new user",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "abd331d7-fd48-4054-9b73-7b7edf2941a6",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"userName\": \"costakilapada\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{API_BASE_URL}}/register",
+							"host": [
+								"{{API_BASE_URL}}"
+							],
+							"path": [
+								"register"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Authentication Required",
+			"item": [
+				{
+					"name": "Group Requests",
+					"item": [
+						{
+							"name": "Create a new group",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"groupName\": \"teste\",\r\n    \"groupDescription\": \"Group for testing purposes\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{API_BASE_URL}}/my/groups",
+									"host": [
+										"{{API_BASE_URL}}"
+									],
+									"path": [
+										"my",
+										"groups"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get my groups",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{API_BASE_URL}}/my/groups",
+									"host": [
+										"{{API_BASE_URL}}"
+									],
+									"path": [
+										"my",
+										"groups"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Edit an existing group",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "abd331d7-fd48-4054-9b73-7b7edf2941a6",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"groupName\": \"teste\",\r\n    \"newGroupName\": \"teste modificado\",\r\n    \"groupDescription\": \"Descrição modificada\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{API_BASE_URL}}/my/groups/edit",
+									"host": [
+										"{{API_BASE_URL}}"
+									],
+									"path": [
+										"my",
+										"groups",
+										"edit"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Delete group by name",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "abd331d7-fd48-4054-9b73-7b7edf2941a6",
+											"type": "string"
+										}
+									]
+								},
+								"method": "DELETE",
+								"header": [],
+								"url": {
+									"raw": "{{API_BASE_URL}}/my/groups/:groupName",
+									"host": [
+										"{{API_BASE_URL}}"
+									],
+									"path": [
+										"my",
+										"groups",
+										":groupName"
+									],
+									"variable": [
+										{
+											"key": "groupName",
+											"value": "teste modificado"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get my group details",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "abd331d7-fd48-4054-9b73-7b7edf2941a6",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{API_BASE_URL}}/my/groups/:groupName",
+									"host": [
+										"{{API_BASE_URL}}"
+									],
+									"path": [
+										"my",
+										"groups",
+										":groupName"
+									],
+									"variable": [
+										{
+											"key": "groupName",
+											"value": "teste modificado"
+										}
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "Game Requests",
+					"item": [
+						{
+							"name": "Add game by name",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "abd331d7-fd48-4054-9b73-7b7edf2941a6",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"groupName\": \"teste\",\r\n    \"gameName\": \"Monopoly\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{API_BASE_URL}}/my/groups/game",
+									"host": [
+										"{{API_BASE_URL}}"
+									],
+									"path": [
+										"my",
+										"groups",
+										"game"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Delete game by name",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "abd331d7-fd48-4054-9b73-7b7edf2941a6",
+											"type": "string"
+										}
+									]
+								},
+								"method": "DELETE",
+								"header": [],
+								"url": {
+									"raw": "{{API_BASE_URL}}/my/groups/:groupName/:gameName",
+									"host": [
+										"{{API_BASE_URL}}"
+									],
+									"path": [
+										"my",
+										"groups",
+										":groupName",
+										":gameName"
+									],
+									"variable": [
+										{
+											"key": "groupName",
+											"value": "teste modificado"
+										},
+										{
+											"key": "gameName",
+											"value": "Pandemic"
+										}
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				}
+			]
+		}
+	],
+	"variable": [
+		{
+			"key": "API_BASE_URL",
+			"value": "localhost:8888/api"
+		}
+	]
+}

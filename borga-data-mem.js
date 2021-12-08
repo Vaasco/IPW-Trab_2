@@ -89,7 +89,6 @@ async function hasGame(gameName){
  *  @returns the new user´s groups.
  */
 async function createNewGroup(groupName, groupDescription, userName){
-    // Erro se o grupo já existir TODO #1
     users[userName].groups[groupName] = {
                 name: groupName, 
                 description: groupDescription,
@@ -102,10 +101,10 @@ async function createNewGroup(groupName, groupDescription, userName){
 /**
  * Gets the groups of a user
  * @param userName user that wants to get the groups
- * @returns the groups of the user
+ * @returns an array with the groups of the user
  */
 async function getGroups(userName){
-    return users[userName].groups
+    return Object.values(users[userName].groups)
 }
 
 /**
@@ -137,10 +136,11 @@ async function editGroup(groupName, givenName, newDescription, userName){
  * @param userName user name that wants to add a game
  * @returns true if the game was added succesfully.
  */
-//Não dar add a um jogo que já existe no grupo TODO #2
 async function addGameToGroup(groupName, gameToAdd, userName){
-    users[userName].groups[groupName].gameNames.push(gameToAdd)
-    return gameToAdd
+    const groupNeeded =users[userName].groups[groupName]
+    if(groupNeeded.gameNames.includes(gameToAdd)) return {success: false}
+    groupNeeded.gameNames.push(gameToAdd)
+    return {success: true, gameAdded: gameToAdd}
 }
 
 /**
@@ -150,7 +150,7 @@ async function addGameToGroup(groupName, gameToAdd, userName){
  * @returns the details of the group.
  */
 async function groupDetails(groupName, userName){
-     return users[userName].groups[groupName]
+    return users[userName].groups[groupName]
 }
 
 /**
@@ -161,7 +161,6 @@ async function groupDetails(groupName, userName){
  */
 async function deleteGroup(groupName, userName){
     delete users[userName].groups[groupName]
-    return true
 }
 
 /**
@@ -173,8 +172,9 @@ async function deleteGroup(groupName, userName){
 */
 async function deleteGameByName(groupName, gameName, userName){
     const gameArray = users[userName].groups[groupName].gameNames
+    if(!gameArray.includes(gameName)) return {success: false}
     users[userName].groups[groupName].gameNames = gameArray.filter(name => gameName !== name)
-    return true
+    return {success: true, gameName}
 } 
 
 /**
@@ -184,6 +184,15 @@ async function deleteGameByName(groupName, gameName, userName){
  */
 async function tokenToUsername(token) {
 	return tokens[token];
+}
+
+/**
+ * 
+ */
+ async function reset() {
+	Object.values(users).forEach(user => {
+		user.groups = {};
+	});
 }
 
 module.exports = {
@@ -199,5 +208,6 @@ module.exports = {
     addGameToGroup: addGameToGroup,
     deleteGameByName: deleteGameByName,
     createNewUser: createNewUser,
-    tokenToUsername: tokenToUsername
+    tokenToUsername: tokenToUsername,
+    reset: reset  
 }

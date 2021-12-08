@@ -79,7 +79,7 @@ function makeGameObj(gameInfo){
         min_players: gameInfo.min_players,
         max_players: gameInfo.max_players,
         min_age: gameInfo.min_age,
-        //description: gameInfo.description_preview,                                       NAO ESQUECER DE DESCOMENTAR!!!!
+        description: gameInfo.description_preview,                                      
         image_url: gameInfo.image_url,
         rules_url: gameInfo.rules_url,
         amazon_rank: gameInfo.amazon_rank,

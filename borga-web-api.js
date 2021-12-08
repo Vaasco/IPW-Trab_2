@@ -1,11 +1,9 @@
 'use strict'
 
 const express = require('express');
-/**
- * Novo
- */
-//const openApiUi = require('swagger-ui-express');
-//const openApiSpec = require('./docs/aliche-spec.json');
+
+const openApiUi = require('swagger-ui-express');
+const openApiSpec = require('./docs/borgaDocs.json');
 
 module.exports = function (services){
 
@@ -127,7 +125,7 @@ module.exports = function (services){
     async function addGameByName(req, res){
         try{
             const body = req.body
-            const gameName = body.gameName.toLowerCase()
+            const gameName = body.gameName
             const added = await services.addGameToGroup(body.groupName, gameName, getBearerToken(req))
             res.json(added)
         }
@@ -197,7 +195,7 @@ module.exports = function (services){
     async function deleteGameByName(req, res){
         try{
             const params = req.params
-            const gameName = params.gameName.toLowerCase()
+            const gameName = params.gameName
             const deletedGame = await services.deleteGameByName(params.groupName,gameName, getBearerToken(req))
             res.json(deletedGame)
         }catch(err){
@@ -220,36 +218,129 @@ module.exports = function (services){
             onError(res, err)
         }
     }
-    
-    
-    //router.use('/docs', openApiUi.serve);
-	//router.get('/docs', openApiUi.setup(openApiSpec));
 
     const router = express.Router()
+    
+    router.use('/docs', openApiUi.serve);
+	router.get('/docs', openApiUi.setup(openApiSpec));
 
     router.use(express.json());
 
+         
     router.get("/global/popular", getMostPopularGames)
+
+    /**
+     *  
+     */
     router.get("/global/game/:gameName", getGameByName)
     
-    //Resource /register
+    /**
+     * 
+     *  /register:
+     *    post:
+     *     summary: Creates a new user.
+     *        
+     */
     router.post("/register", createNewUser)
     
-    // Resource /my/groups
+    /**
+     * 
+     *  /my/groups:
+     *   get:
+     *    summary: Gets all the groups of an user's collection.
+     *    security:
+     *     - bearerAuth: []
+     *  
+     */
     router.get("/my/groups", getMyGroups)
+    /**
+     * 
+     *  /my/groups:
+     *   post:
+     *    summary: Adds a new group to a user's collection.
+     *    security: 
+     *     - bearerAuth: []  
+     */
     router.post("/my/groups", addGroup)
 
     // Resource /my/groups
+    /**
+     * 
+     *  /my/groups/edit:
+     *   post:
+     *    summary: Edits a group of an user´s collection. 
+     *    security: 
+     *     - bearerAuth: []      
+     */
     router.post("/my/groups/edit", editGroup)
 
     // Resource /my/groups/game
+    /**
+     * 
+     *  /my/groups/game:
+     *   post:
+     *    summary: Adds a game to a group of an user´s collection. 
+     *    security: 
+     *     - bearerAuth: [] 
+     */
     router.post("/my/groups/game", addGameByName)
 
     // Resource /my/groups/<groupName>
+    /**
+     * 
+     *  /my/groups/{groupName}:
+     *   get:
+     *    summary: Gets the details of a group of an user's collection.
+     *    security:
+     *     - bearerAuth: [] 
+     *    parameters:
+     *      - in: path
+     *        name: groupName
+     *        schema:
+     *         type: string
+     *        required: true
+     *        description: Name of the group to get the details.        
+     */
     router.get("/my/groups/:groupName", getGroupDetails)
+    /**
+     * 
+     *  /my/groups/{groupName}:
+     *   delete:
+     *     summary: Deletes a group from this user.
+     *     security: 
+     *      - bearerAuth: []  
+     *     parameters:
+     *      - in: path
+     *        name: groupName
+     *        schema:
+     *         type: String
+     *        required: true
+     *        description: Name of the group to delete.
+     */
     router.delete("/my/groups/:groupName", deleteGroupByName)
 
     // Resource /my/groups/<groupName>/<gameName>
+    /**
+     * 
+     *  /my/groups/{groupName}/{gameName}: 
+     *   delete:
+     *    summary: Deletes a game of a group of a user's collection.
+     *    security:
+     *     - bearerAuth: []
+     *    parameters:
+     *     - in: path
+     *       name: groupName
+     *       schema:
+     *        type: String
+     *       required: true
+     *       description: Name of the group that contains the game to delete.
+     *     - in: path   
+     *       name: gameName
+     *       schema:
+     *        type: String
+     *       required: true
+     *       description: Name of the game to delete.         
+     */
     router.delete("/my/groups/:groupName/:gameName", deleteGameByName)
 
     return router
