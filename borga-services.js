@@ -7,7 +7,6 @@ const USER_LENGHT_ERROR = "User should have at least 4 and at most 16 characters
 const USER_ALREADY_EXISTS = "Username already exists"
 const GROUP_ALREADY_EXISTS = "Group already exists"
 const INVALID_GROUP = "Group does not exist in collection"
-const INVALID_GAME = "Game does not exist in our collection."
 const NO_TOKEN = 'No token provided.'
 const BAD_TOKEN = 'Wrong token provided.'
 const MISSING_GROUP_NAME = "Missing group name."
@@ -25,7 +24,11 @@ module.exports = (games_data, data_mem) => {
     async function requireGroup(groupName, user){
         if(!(await data_mem.hasGroup(groupName, user))) throw errors.INVALID_PARAM(INVALID_GROUP)
     }
-
+    /**
+     * Creates a new user
+     * @param userName 
+     * @returns user response = {userName: "User", token: "Token"} 
+     */
     async function createNewUser(userName){
         if(!userName) throw errors.MISSING_PARAM(USERNAME_REQUIRED)
         if(userName.length <= 4 || userName.length >= 16) 
