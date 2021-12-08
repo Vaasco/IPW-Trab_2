@@ -76,7 +76,7 @@ module.exports = function (services){
      */
     async function getGameByName(req, res){
         try{
-            const gameName = req.params.gameName 
+            const gameName = req.params.gameName.toLowerCase()
             const game = await services.getGameWithName(gameName)
             res.json(game)   
         }
@@ -127,7 +127,8 @@ module.exports = function (services){
     async function addGameByName(req, res){
         try{
             const body = req.body
-            const added = await services.addGameToGroup(body.groupName, body.gameName, getBearerToken(req))
+            const gameName = body.gameName.toLowerCase()
+            const added = await services.addGameToGroup(body.groupName, gameName, getBearerToken(req))
             res.json(added)
         }
         catch(err){
@@ -144,11 +145,11 @@ module.exports = function (services){
     async function editGroup(req, res){
         try{
             const body = req.body
-            const newGroups = await services.editMyGroup(body.groupName, body.newGroupName
-                , body.groupDescription
+            const newGroup = await services.editMyGroup(body.groupName, body.newGroupName
+                , body.newDescription
                 ,getBearerToken(req)
                 )
-            res.json(newGroups) 
+            res.json(newGroup) 
         }
         catch(err){
             onError(res,err)
@@ -196,7 +197,8 @@ module.exports = function (services){
     async function deleteGameByName(req, res){
         try{
             const params = req.params
-            const deletedGame = await services.deleteGameByName(params.groupName,params.gameName, getBearerToken(req))
+            const gameName = params.gameName.toLowerCase()
+            const deletedGame = await services.deleteGameByName(params.groupName,gameName, getBearerToken(req))
             res.json(deletedGame)
         }catch(err){
             onError(res, err)
@@ -228,7 +230,7 @@ module.exports = function (services){
     router.use(express.json());
 
     router.get("/global/popular", getMostPopularGames)
-    router.get("/global/:gameName", getGameByName)
+    router.get("/global/game/:gameName", getGameByName)
     
     //Resource /register
     router.post("/register", createNewUser)

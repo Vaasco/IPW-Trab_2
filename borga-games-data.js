@@ -13,6 +13,7 @@ const ATLAS_BORGA_ID = process.env.ATLAS_CLIENT_ID
 const GAMES_BASE_URI = "https://api.boardgameatlas.com/api/search?"
 const CLIENT_QUERY = `&client_id=${ATLAS_BORGA_ID}`
 const HTTP_SERVER_ERROR = 5;
+const GAME_NOT_FOUND = `Game does not exist.`
 
 /**
  * Gets the number that represents the status. (5 -> represents status 500, 501...).
@@ -64,7 +65,7 @@ function makeGameObj(gameInfo){
      * Replaces undefined for null of all undefined properties.
      */
     const handleProperties = (myObject) => {
-        Object.keys(myObject).map(function(key, index) {
+        Object.keys(myObject).forEach((key) => {
             myObject[key] = nullIfUndefined(myObject[key]);
           });
         return myObject
@@ -101,9 +102,14 @@ async function findPopularGames(){
  * Fetches from the given uri the game with the respective name
  */
 async function findGameByName(gameName){
-    return do_fetch(GAMES_BASE_URI+`name=${gameName}`+CLIENT_QUERY)
+    const uri = GAMES_BASE_URI+`name=${gameName}`+CLIENT_QUERY
+    return do_fetch(uri)
     .then(answer => {
-        return makeGameObj(answer.games[0])
+        const games = answer.games
+       if(games.length > 0) 
+            return makeGameObj(games[0])
+        else
+            throw errors.NOT_FOUND(GAME_NOT_FOUND)
     })
 }
 

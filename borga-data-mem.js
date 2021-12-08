@@ -29,10 +29,21 @@ const gameCollection = {games: {}}
  * @returns true if the new user was created succesfully.
  */
 async function createNewUser(name){
-    tokens[crypto.randomUUID()] = name
-    users[name] = {groups: {}}
-    console.log(tokens)
-    return true
+    let success = false
+    const userExists = await hasUser(name)
+    if(userExists) return {success}
+    const token = crypto.randomUUID()
+    tokens[token] = name 
+    users[name] = { groups: {}}
+    success = true
+    return {success , token}
+}
+
+/**
+ * Cheks if already exists a user with {name} in {users}
+ */
+async function hasUser(name){
+    return !!users[name]
 }
 
 /**
@@ -40,8 +51,8 @@ async function createNewUser(name){
  * @param game to add to the collection.
  * @returns true if the game was added to the collection succesfully.
  */
-async function addGameToCollection(game){
-    gameCollection.games[game.name] = game
+async function addGameToCollection(game, gameName){
+    gameCollection.games[gameName] = game
     return true 
 }
 
@@ -55,12 +66,19 @@ async function getGame(gameName){
 }
 
 /**
- * Checks if the collection has the game.
+ * Checks if there is a game identified by {gameName} in game's collection.
  * @param gameName of the game to check. 
- * @returns true if it isn´t undefined in the collection.
+ * @returns true if game exists
  */
 async function hasGame(gameName){         
     return !!gameCollection.games[gameName]
+}
+
+/**
+ * 
+ */
+ async function hasGroup(groupName, userName){
+    return !!users[userName].groups[groupName]
 }
 
 /**
@@ -78,7 +96,7 @@ async function createNewGroup(groupName, groupDescription, userName){
                 gameNames: []
             }
     
-    return users[userName].groups
+    return users[userName].groups[groupName]
 }
 
 /**
@@ -100,15 +118,16 @@ async function getGroups(userName){
  */
 async function editGroup(groupName, givenName, newDescription, userName){
     const userToEdit = users[userName]
-    const desc = newDescription ? newDescription : userToEdit.groups[groupName].description 
-    const newName = givenName ? givenName : groupName   
+    const desc = newDescription || userToEdit.groups[groupName].description 
+    const newName = givenName || groupName
+    const games = userToEdit.groups[groupName].gameNames
+    delete userToEdit.groups[groupName]   
     userToEdit.groups[newName] = {
         name: newName,
         description: desc,
-        gameNames: userToEdit.groups[groupName].gameNames
+        gameNames: games
     }
-    delete userToEdit.groups[groupName]
-    return userToEdit.groups  
+    return userToEdit.groups[newName] 
 }
 
 /**
@@ -121,7 +140,7 @@ async function editGroup(groupName, givenName, newDescription, userName){
 //Não dar add a um jogo que já existe no grupo TODO #2
 async function addGameToGroup(groupName, gameToAdd, userName){
     users[userName].groups[groupName].gameNames.push(gameToAdd)
-    return true
+    return gameToAdd
 }
 
 /**
@@ -173,6 +192,7 @@ module.exports = {
     editGroup: editGroup,
     groupDetails: groupDetails,
     deleteGroup: deleteGroup,
+    hasGroup: hasGroup,
     hasGame: hasGame,
     getGame: getGame,
     addGameToCollection: addGameToCollection,
