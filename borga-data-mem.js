@@ -23,6 +23,10 @@ const tokens = {
 /**Object with the requested games.*/
 const gameCollection = {games: {}}
 
+function generateRandomId(){
+    return Math.floor(Math.random() * Math.floor(Math.random() * Date.now())).toString()
+}
+
 /**
  * Creates a token and links it to the given name creating a new user.
  * @param name to link to the token.
@@ -51,8 +55,8 @@ async function hasUser(name){
  * @param game to add to the collection.
  * @returns true if the game was added to the collection succesfully.
  */
-async function addGameToCollection(game, gameName){
-    gameCollection.games[gameName] = game
+async function addGameToCollection(game){
+    gameCollection.games[game.id] = game
     return true 
 }
 
@@ -61,24 +65,32 @@ async function addGameToCollection(game, gameName){
  * @param gameName of the game to get
  * @returns game from the collection 
  */
-async function getGame(gameName){
-    return gameCollection.games[gameName]
+async function getGame(gameID){
+    return gameCollection.games[gameID]
 }
+
+/**
+ * Checks if there is a game identified by {gameID} in game's collection.
+ * @param gameName of the game to check. 
+ * @returns true if game exists
+ */
+async function hasGameByID(gameID){ return !!getGame(gameID) }
 
 /**
  * Checks if there is a game identified by {gameName} in game's collection.
  * @param gameName of the game to check. 
  * @returns true if game exists
  */
-async function hasGame(gameName){         
-    return !!gameCollection.games[gameName]
+ async function hasGameByName(gameName){         
+    return Object.values(gameCollection).some((game) => gameName === game.name)
 }
+
 
 /**
  * 
  */
- async function hasGroup(groupName, userName){
-    return !!users[userName].groups[groupName]
+ async function hasGroup(groupID, userName){
+    return !!users[userName].groups[groupID]
 }
 
 /**
@@ -86,16 +98,18 @@ async function hasGame(gameName){
  *  @param groupName group to add.
  *  @param groupDescription description to add.
  *  @param userName user that wants to add a new group to his collection.
- *  @returns the new user´s groups.
+ *  @returns the new user's groups.
  */
 async function createNewGroup(groupName, groupDescription, userName){
-    users[userName].groups[groupName] = {
-                name: groupName, 
-                description: groupDescription,
-                gameNames: []
-            }
+    const groupGeneratedId = generateRandomId()
+    const createdGroup = {
+        name: groupName, 
+        description: groupDescription,
+        games: []
+    }
+    users[userName].groups[groupGeneratedId] = createdGroup
     
-    return users[userName].groups[groupName]
+    return {id:groupGeneratedId, groupObject: {name: createdGroup.name, description: createdGroup.description}}
 }
 
 /**
@@ -104,63 +118,66 @@ async function createNewGroup(groupName, groupDescription, userName){
  * @returns an array with the groups of the user
  */
 async function getGroups(userName){
-    return Object.values(users[userName].groups)
+    return Object.entries(users[userName].groups).map((entry) =>{ 
+        const groupID = entry[0]
+        const groupObject = entry[1]
+        const groupCopy = {...groupObject}
+        groupCopy.id = groupID
+        return groupCopy
+    })
 }
 
 /**
  * Edits a group of a user with the given new name and description.
- * @param groupName the group to replace it´s name and description.
+ * @param groupID the group to be edited.
  * @param givenName given group name to replace with the current one.
  * @param newDescription given description to replace with the current one.
  * @param userName user that wants to edit the group name and description.
- * @returns the user´s updated groups.
+ * @returns the user's updated groups.
  */
-async function editGroup(groupName, givenName, newDescription, userName){
+async function editGroup(groupID, givenName, newDescription, userName){
     const userToEdit = users[userName]
-    const desc = newDescription || userToEdit.groups[groupName].description 
-    const newName = givenName || groupName
-    const games = userToEdit.groups[groupName].gameNames
-    delete userToEdit.groups[groupName]   
-    userToEdit.groups[newName] = {
-        name: newName,
-        description: desc,
-        gameNames: games
-    }
-    return userToEdit.groups[newName] 
+    const groupToEdit = userToEdit.groups[groupID]
+    const desc = newDescription || groupToEdit.description 
+    const newName = givenName || groupToEdit.groupName
+    const games = groupToEdit.gameNames
+    groupToEdit.name = newName
+    groupToEdit.description = desc  
+    return groupToEdit
 }
 
 /**
  * Adds a game to a group.
- * @param groupName group that will have the added game.
- * @param gameToAdd game to add to a group.
+ * @param groupID group that will have the added game.
+ * @param gameID game to add to the group.
  * @param userName user name that wants to add a game
  * @returns true if the game was added succesfully.
  */
-async function addGameToGroup(groupName, gameToAdd, userName){
-    const groupNeeded =users[userName].groups[groupName]
-    if(groupNeeded.gameNames.includes(gameToAdd)) return {success: false}
-    groupNeeded.gameNames.push(gameToAdd)
-    return {success: true, gameAdded: gameToAdd}
+async function addGameToGroup(groupID, gameID, userName){
+    const groupNeeded = users[userName].groups[groupID]
+    if(groupNeeded.games.includes(gameID)) return {success: false}
+    groupNeeded.games.push(gameID)
+    return {success: true, gameAdded: gameID}
 }
 
 /**
  * Gets the details of a group
- * @param groupName of the group in order to get the details.
- * @param userName of the user that wants to get the details.
+ * @param groupID of the group in order to get the details.
+ * @param userName of the user that wants to get the details. 
  * @returns the details of the group.
  */
-async function groupDetails(groupName, userName){
-    return users[userName].groups[groupName]
+async function groupDetails(groupID, userName){
+    return users[userName].groups[groupID]
 }
 
 /**
  * Deletes a group
- * @param groupName of the group in order to delete it.
+ * @param groupID group getting deleted.
  * @param userName of the user that wants to delete the group.
  * @returns true if the group was deleted succesfully.
  */
-async function deleteGroup(groupName, userName){
-    delete users[userName].groups[groupName]
+async function deleteGroup(groupID, userName){
+    delete users[userName].groups[groupID]
 }
 
 /**
@@ -170,11 +187,11 @@ async function deleteGroup(groupName, userName){
 * @param userName of the user that wants to delete it.
 * @returns true if the game was deleted succesfully.
 */
-async function deleteGameByName(groupName, gameName, userName){
-    const gameArray = users[userName].groups[groupName].gameNames
-    if(!gameArray.includes(gameName)) return {success: false}
-    users[userName].groups[groupName].gameNames = gameArray.filter(name => gameName !== name)
-    return {success: true, gameName}
+async function deleteGameFromGroup(groupID, gameID, userName){
+    const gameArray = users[userName].groups[groupID].games
+    if(!gameArray.includes(gameID)) return {success: false}
+    users[userName].groups[groupID].games = gameArray.filter(id => gameID !== id)
+    return {success: true, gameName: gameCollection.games[gameID].name}
 } 
 
 /**
@@ -202,11 +219,12 @@ module.exports = {
     groupDetails: groupDetails,
     deleteGroup: deleteGroup,
     hasGroup: hasGroup,
-    hasGame: hasGame,
+    hasGame: hasGameByID,
+    hasGameByName: hasGameByName,
     getGame: getGame,
     addGameToCollection: addGameToCollection,
     addGameToGroup: addGameToGroup,
-    deleteGameByName: deleteGameByName,
+    deleteGameFromGroup: deleteGameFromGroup,
     createNewUser: createNewUser,
     tokenToUsername: tokenToUsername,
     reset: reset  

@@ -5,14 +5,13 @@ const errors = require('./borga-errors.js');
 // Error messages
 const USER_LENGHT_ERROR = "User should have at least 4 and at most 16 characters."
 const USER_ALREADY_EXISTS = "Username already exists"
-const GROUP_ALREADY_EXISTS = "Group already exists"
 const INVALID_GROUP = "Group does not exist in collection"
 const NO_TOKEN = 'No token provided.'
 const BAD_TOKEN = 'Wrong token provided.'
-const MISSING_GROUP_NAME = "Missing group name."
-const MISSING_GAME_NAME = "Missing game name."
+const MISSING_GROUP_ID = "Missing group id."
+const MISSING_GAME_ID = "Missing game id."
 const GAME_ALREADY_IN_GROUP = "Game already in this group."
-const GAME_NOT_IN_GROUP = "Group has no game with this name."
+const GAME_NOT_IN_GROUP = "Group has no game with this id."
 const NAME_OR_DESCRIPTION_REQUIRED = "Need at least a new group name or a new description to edit a group."
 const USERNAME_REQUIRED = "Username required."
 
@@ -21,8 +20,8 @@ module.exports = (games_data, data_mem) => {
     /**
      * Function used in functions that require the group existance
      */
-    async function requireGroup(groupName, user){
-        if(!(await data_mem.hasGroup(groupName, user))) throw errors.INVALID_PARAM(INVALID_GROUP)
+    async function requireGroup(groupID, user){
+        if(!(await data_mem.hasGroup(groupID, user))) throw errors.INVALID_PARAM(INVALID_GROUP)
     }
     /**
      * Creates a new user
@@ -67,23 +66,14 @@ module.exports = (games_data, data_mem) => {
      * @returns the requested game.
      */
     async function getGameWithName(gameName){
-        const gameExists = await data_mem.hasGame(gameName)
-        const game = gameExists ? await data_mem.getGame(gameName) : await getGameFromBorgaAPI(gameName)
-        return {game}
+        const game = await games_data.findGameByName(gameName)
+        const gameExists = await data_mem.hasGameByName(gameName)
+        if(!gameExists) await data_mem.addGameToCollection(game)
+        return { game }
+
     }
 
-    /**
-     * Gets a game from the Board Games Atlas and adds it to the game collection in memory.
-     * @param gameName name of the game to get. 
-     * @returns game from board game atlas api sanitized 
-     */
-    async function getGameFromBorgaAPI(gameName){
-        const gameFromBorga = await games_data.findGameByName(gameName)
-        await data_mem.addGameToCollection(gameFromBorga, gameName)
-        return gameFromBorga
-    }
-
-     /**            Group Info Acess            **/
+     /**            Group Info Access            **/
 
     /**
      * Gets the groups of a user.
@@ -102,10 +92,10 @@ module.exports = (games_data, data_mem) => {
      * @param token identifies the user that wants to get the details of one of his groups.
      * @returns an object with the group name.
      */
-    async function groupDetails(groupName, token){
+    async function groupDetails(groupID, token){
         const user = await getUsername(token)
-        await requireGroup(groupName, user)
-        const group = await data_mem.groupDetails(groupName, user)
+        await requireGroup(groupID, user)
+        const group = await data_mem.groupDetails(groupID, user)
         return { group }
     }
 
@@ -120,11 +110,10 @@ module.exports = (games_data, data_mem) => {
      */
      async function createNewGroup(groupName, groupDescription, token){
         const userName = await getUsername(token)
-        if(await data_mem.hasGroup(groupName, userName)) throw errors.INVALID_PARAM(GROUP_ALREADY_EXISTS)
-        if(!groupName) throw errors.MISSING_PARAM(MISSING_GROUP_NAME)
+        if(!groupName) throw errors.MISSING_PARAM(MISSING_GROUP_ID)
         const description = groupDescription || ""
-        const group = await data_mem.createNewGroup(groupName, description, userName)
-        return { group }
+        const groupResponse = await data_mem.createNewGroup(groupName, description, userName)
+        return groupResponse
     }
     
     /**
@@ -135,12 +124,12 @@ module.exports = (games_data, data_mem) => {
      * @param token identifies the user that wants to edit the group.
      * @returns an object with the group edited
      */
-     async function editGroup(groupName, newGroupName, newDescription, token){
+     async function editGroup(groupID, newGroupName, newDescription, token){
         const user = await getUsername(token)
-        if(!groupName) throw errors.MISSING_PARAM(MISSING_GROUP_NAME)
+        if(!groupID) throw errors.MISSING_PARAM(MISSING_GROUP_ID)
         if(!newGroupName && !newDescription) throw errors.MISSING_PARAM(NAME_OR_DESCRIPTION_REQUIRED)
-        await requireGroup(groupName, user)
-        const group = await data_mem.editGroup(groupName, newGroupName, newDescription, user) 
+        await requireGroup(groupID, user)
+        const group = await data_mem.editGroup(groupID, newGroupName, newDescription, user) 
         return { group }
     }
 
@@ -150,11 +139,11 @@ module.exports = (games_data, data_mem) => {
      * @param token identifies the user that wants to delete one of his groups.
      * @returns an object with the groupName if deleted
      */
-    async function deleteGroup(groupName, token){
+    async function deleteGroup(groupID, token){
         const user = await getUsername(token)
-        await requireGroup(groupName, user)
-        await data_mem.deleteGroup(groupName, user)
-        return { groupName }
+        await requireGroup(groupID, user)
+        await data_mem.deleteGroup(groupID, user)
+        return { groupID }
     }
 
 
@@ -167,32 +156,31 @@ module.exports = (games_data, data_mem) => {
      * @param token 
      * @returns true if it was succesfully added.
      */
-     async function addGameToGroup(groupName, gameName, token){   
+     async function addGameToGroup(groupID, gameID, token){   
+        if(!groupID) throw errors.MISSING_PARAM(MISSING_GROUP_ID) 
+        if(!gameID) throw errors.MISSING_PARAM(MISSING_GAME_ID)// -> NAO ESQUECER DE ALTERAR PRA GAME!
         const user = await getUsername(token)
-        if(!groupName) throw errors.MISSING_PARAM(MISSING_GROUP_NAME) 
-        if(!gameName) throw errors.MISSING_PARAM(MISSING_GAME_NAME) 
-        await requireGroup(groupName, user)
-        const nameLowered = gameName.toLowerCase() 
-        const gameExists = await data_mem.hasGame(nameLowered)
-        if(!gameExists) await getGameFromBorgaAPI(nameLowered)
+        await requireGroup(groupID, user)
+
+        const gameExists = await data_mem.hasGame(gameID)
+        if(!gameExists) throw errors.INVALID_PARAM()
         
-        const result = await data_mem.addGameToGroup(groupName, nameLowered, user)
+        const result = await data_mem.addGameToGroup(groupID, gameID, user)
         if(!result.success) throw errors.INVALID_PARAM(GAME_ALREADY_IN_GROUP)
-        return {gameName: result.gameAdded} 
+        return {gameID: result.gameAdded} 
     }
 
     /**
-     * Deletes a game by it´s name.
+     * Deletes a game by it's name.
      * @param groupName name of the group where the game is inserted.
      * @param gameName name of the game to be deleted. 
      * @param token identifies the user that wants to delete one of his games from a group.
      * @returns true if the delete was succesfull.
      */
-    async function deleteGameByName(groupName, gameName, token){
+    async function deleteGameByName(groupID, gameID, token){
         const user = await getUsername(token)
-        await requireGroup(groupName, user)
-        const nameLowered = gameName.toLowerCase()
-        const result = await data_mem.deleteGameByName(groupName, nameLowered, user)
+        await requireGroup(groupID, user)
+        const result = await data_mem.deleteGameFromGroup(groupID, gameID, user)
         if(!result.success) throw errors.INVALID_PARAM(GAME_NOT_IN_GROUP)
         return {gameName: result.gameName} 
     }

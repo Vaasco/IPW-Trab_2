@@ -202,7 +202,7 @@
                         "content":{
                             "application/json": {
                                 "schema": {
-                                    "$ref": "#/components/schemas/GroupResponse"
+                                    "$ref": "#/components/schemas/GroupCreator"
                                 }
                             }
                         }
@@ -712,6 +712,18 @@
                     }
                 }
             },
+            "GroupListElement":{
+                "type": "object",
+                "description": "User's group",
+                "properties": {
+                    "groups":{
+                        "type": "array",
+                        "items":{
+                            "$ref": "#/components/schemas/Group"
+                        }
+                    }
+                }
+            },
             "GroupOperationResponse":{
                 "type": "object",
                 "description": "Game operation completed successfully.",
@@ -719,9 +731,23 @@
                     "groupName"
                 ],
                 "properties": {
-                    "gameName": {
+                    
+                    "newGroupName":{
                         "type": "string"
                     },
+                    "newGroupDescription": {
+                        "type": "string"
+                    }
+                }
+            },
+            "GroupEditBody":{
+                "type": "object",
+                "description": "Game operation completed successfully.",
+                "required": [
+                    "groupName"
+                ],
+                "properties": {
+                    
                     "newGroupName":{
                         "type": "string"
                     },
@@ -741,15 +767,24 @@
             },
             "GroupCreator":{
                 "type": "object",
-                "description": "Object with a group name and description.",
+                "description": "Object with a group Id and group name and description.",
                 "properties": {
-                    "groupName": {
-                        "type": "string",
-                        "example": "MyGames"
+                    "id":{
+                        "type": "number",
+                        "example": "1258415713459"   
                     },
-                    "groupDescription": {
-                        "type": "string",
-                        "example": "Jogos que já joguei"
+                    "groupObject":{
+                        "type": "object",
+                        "properties":{ 
+                            "groupName": {
+                                "type": "string",
+                                "example": "MyGames"
+                            },
+                            "groupDescription": {
+                                "type": "string",
+                                "example": "Jogos que já joguei"
+                            }
+                        }
                     }
                 }
             },  

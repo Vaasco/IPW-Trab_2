@@ -117,16 +117,17 @@ module.exports = function (services){
     }
 
     /**
-     * Adds a game by its name to a user´s group.
+     * Adds a game by its name to a user's group.
      * @throws the respective {onError()} error.
      * @param req the request. 
      * @param res the response.
      */
-    async function addGameByName(req, res){
+    async function addGameByID(req, res){
         try{
             const body = req.body
-            const gameName = body.gameName
-            const added = await services.addGameToGroup(body.groupName, gameName, getBearerToken(req))
+            const gameID = body.gameID
+            const groupID = body.id
+            const added = await services.addGameToGroup(groupID, gameID, getBearerToken(req))
             res.json(added)
         }
         catch(err){
@@ -143,7 +144,7 @@ module.exports = function (services){
     async function editGroup(req, res){
         try{
             const body = req.body
-            const newGroup = await services.editMyGroup(body.groupName, body.newGroupName
+            const newGroup = await services.editMyGroup(body.id, body.newGroupName
                 , body.newDescription
                 ,getBearerToken(req)
                 )
@@ -160,10 +161,10 @@ module.exports = function (services){
      * @param req the request. 
      * @param res the response. 
      */
-    async function deleteGroupByName(req, res){
+    async function deleteGroupById(req, res){
         try{
-            const groupName = req.params.groupName
-            const deleted = await services.deleteGroup(groupName, getBearerToken(req))
+            const groupID = req.params.groupID
+            const deleted = await services.deleteGroup(groupID, getBearerToken(req))
             res.json(deleted)
         }catch(err){
             onError(res, err)
@@ -178,8 +179,8 @@ module.exports = function (services){
      */
     async function getGroupDetails(req,res){
         try{
-            const groupName = req.params.groupName
-            const group = await services.getDetails(groupName, getBearerToken(req))
+            const groupID = req.params.groupID
+            const group = await services.getDetails(groupID, getBearerToken(req))
             res.json(group)
         }catch(err){
             onError(res, err)
@@ -195,8 +196,8 @@ module.exports = function (services){
     async function deleteGameByName(req, res){
         try{
             const params = req.params
-            const gameName = params.gameName
-            const deletedGame = await services.deleteGameByName(params.groupName,gameName, getBearerToken(req))
+            const gameID = params.gameID
+            const deletedGame = await services.deleteGameByName(params.groupID,gameID, getBearerToken(req))
             res.json(deletedGame)
         }catch(err){
             onError(res, err)
@@ -241,14 +242,14 @@ module.exports = function (services){
     router.post("/my/groups/edit", editGroup)
 
     // Resource /my/groups/game
-    router.post("/my/groups/game", addGameByName)
+    router.post("/my/groups/game", addGameByID)
 
     // Resource /my/groups/<groupName>
-    router.get("/my/groups/:groupName", getGroupDetails)
-    router.delete("/my/groups/:groupName", deleteGroupByName)
+    router.get("/my/groups/:groupID", getGroupDetails)
+    router.delete("/my/groups/:groupID", deleteGroupById)
 
     // Resource /my/groups/<groupName>/<gameName>
-    router.delete("/my/groups/:groupName/:gameName", deleteGameByName)
+    router.delete("/my/groups/:groupID/:gameID", deleteGameByName)
 
     return router
 }

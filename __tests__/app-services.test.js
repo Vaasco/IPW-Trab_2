@@ -22,6 +22,7 @@ describe('Tests with data_mem', () => {
     });
     
     test("Create new group", async () => {
+        
         const group = await createTestGroup()
         expect(group).toEqual({
             "group": {
@@ -54,10 +55,11 @@ describe('Tests with data_mem', () => {
     test("Edit group", async () => {
 
         // Edit group Success 
-        await createTestGroup()
+        const groupCreated = await createTestGroup()
+        const groupID = groupCreated.id
         const newGroupName = "newName"
         const newDescription = "new Description"
-        const group = await services.editMyGroup(test_group, newGroupName, newDescription, test_token)
+        const group = await services.editMyGroup(groupID, newGroupName, newDescription, test_token)
         
         expect(group).toEqual({
             "group": {
@@ -80,13 +82,13 @@ describe('Tests with data_mem', () => {
         }
 
         try{
-            await services.editMyGroup("invalidname", newGroupName,newDescription, test_token)
+            await services.editMyGroup("invalidname", newGroupName, newDescription, test_token)
         }catch(err){
             expect(err.name).toEqual("INVALID_PARAM")
         }
 
         try{
-            await services.editMyGroup(test_group, newGroupName, newDescription, undefined)
+            await services.editMyGroup(groupID, newGroupName, newDescription, undefined)
         }catch(err){
             expect(err.name).toEqual("UNAUTHENTICATED")
         }
@@ -119,7 +121,7 @@ describe('Tests with data_mem', () => {
 
     test("Delete group", async () => {
         await createTestGroup()
-        const group = await services.deleteGroup(test_group, test_token)
+        const group = await services.deleteGroup(groupID, test_token)
         expect(group).toEqual({
             "groupName": "testGroup"
         })
@@ -131,7 +133,7 @@ describe('Tests with data_mem', () => {
         }
 
         try{
-            await services.deleteGroup(test_group, undefined)
+            await services.deleteGroup(groupID, undefined)
         }catch(err){
             expect(err.name).toEqual("UNAUTHENTICATED")
         }
@@ -139,7 +141,7 @@ describe('Tests with data_mem', () => {
 
     test("Get Details of a group", async () => {
         await createTestGroup()
-        const groupDetails = await services.getDetails(test_group, test_token)
+        const groupDetails = await services.getDetails(groupID, test_token)
         expect(groupDetails).toEqual(groupDetails)
         
         
@@ -150,7 +152,7 @@ describe('Tests with data_mem', () => {
         }
 
         try{
-            await services.getDetails(test_group, undefined)
+            await services.getDetails(groupID, undefined)
         }catch(err){
             expect(err.name).toEqual("UNAUTHENTICATED")
         }
@@ -159,10 +161,9 @@ describe('Tests with data_mem', () => {
 
     test("Remove a game from a group", async () => {
         const groupRes = await createTestGroup()
-        const gameName = "pandemic"
         const groupName = groupRes.group.name
-        await test_data_int.addGameToGroup(groupName, gameName, test_user)
-        const gameNameRes = await services.deleteGameByName(test_group, gameName, test_token)
+        await test_data_int.addGameToGroup(groupID, gameName, test_user)
+        const gameNameRes = await services.deleteGameByName(groupID, gameName, test_token)
         expect(gameNameRes.gameName).toEqual(gameName)
         
         
@@ -173,13 +174,13 @@ describe('Tests with data_mem', () => {
         }
         
         try{
-            await services.deleteGameByName(groupName, "invalidgame", test_token)
+            await services.deleteGameByName(groupID, "invalidgame", test_token)
         }catch(err){
             expect(err.name).toEqual("INVALID_PARAM")
         }
         
         try{
-            await services.deleteGameByName(groupName, gameName, undefined)
+            await services.deleteGameByName(groupID, gameName, undefined)
         }catch(err){
             expect(err.name).toEqual("UNAUTHENTICATED")
         }
@@ -187,10 +188,9 @@ describe('Tests with data_mem', () => {
 
     test("Remove a game from a group", async () => {
         const groupRes = await createTestGroup()
-        const gameName = "pandemic"
         const groupName = groupRes.group.name
-        await test_data_int.addGameToGroup(groupName, gameName, test_user)
-        const gameNameRes = await services.deleteGameByName(test_group, gameName, test_token)
+        await test_data_int.addGameToGroup(groupID, gameName, test_user)
+        const gameNameRes = await services.deleteGameByName(groupID, gameName, test_token)
         expect(gameNameRes.gameName).toEqual(gameName)
         
         
@@ -201,13 +201,13 @@ describe('Tests with data_mem', () => {
         }
         
         try{
-            await services.deleteGameByName(groupName, "invalidgame", test_token)
+            await services.deleteGameByName(groupID, "invalidgame", test_token)
         }catch(err){
             expect(err.name).toEqual("INVALID_PARAM")
         }
         
         try{
-            await services.deleteGameByName(groupName, gameName, undefined)
+            await services.deleteGameByName(groupID, gameName, undefined)
         }catch(err){
             expect(err.name).toEqual("UNAUTHENTICATED")
         }
