@@ -1,23 +1,24 @@
+---
 openapi: 3.0.3
 info:
   title: Borga Games
   description: IPW First Assignement API. Manage your game collection.
-  termsOfService: 'http://swagger.io/terms/'
+  termsOfService: http://swagger.io/terms/
   servers:
-    - 'http://localhost:8888'
+  - http://localhost:8888
 servers:
-  - url: 'http://localhost:8888/api'
-    description: Local Server
+- url: http://localhost:8888/api
+  description: Local Server
 tags:
-  - name: Global
-    description: Request that can be done without authenticating.
-  - name: User
-    description: Request that can only be done while authenticated.
+- name: Global
+  description: Request that can be done without authenticating.
+- name: User
+  description: Request that can only be done while authenticated.
 paths:
-  /global/popular:
+  "/global/popular":
     get:
       tags:
-        - Global
+      - Global
       summary: Gets the 10 most popular games.
       responses:
         '200':
@@ -25,49 +26,49 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/GameList'
+                "$ref": "#/components/schemas/GameList"
         '502':
           description: Board Game Atlas is not responding.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/AppError'
-  '/global/game/{gameName}':
+                "$ref": "#/components/schemas/AppError"
+  "/global/game/{gameName}":
     get:
       tags:
-        - Global
+      - Global
       summary: Gets the game by name.
       parameters:
-        - name: gameName
-          in: path
-          required: true
-          description: Game's name to search for.
-          schema:
-            type: string
-          example: Pandemic
+      - name: gameName
+        in: path
+        required: true
+        description: Game's name to search for.
+        schema:
+          type: string
+        example: Pandemic
       responses:
         '200':
           description: If everything goes right.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/GameResponse'
+                "$ref": "#/components/schemas/GameResponse"
         '404':
           description: No game found with this name
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/AppError'
+                "$ref": "#/components/schemas/AppError"
         '502':
           description: Board Game Atlas is not responding
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/AppError'
-  /register:
+                "$ref": "#/components/schemas/AppError"
+  "/register":
     post:
       tags:
-        - Global
+      - Global
       summary: Creates a new user
       requestBody:
         description: Name of the user to register
@@ -75,43 +76,43 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/UserName'
+              "$ref": "#/components/schemas/UserName"
       responses:
         '200':
           description: The user is now registed
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/UserRegister'
+                "$ref": "#/components/schemas/UserRegister"
         '400':
           description: Invalid or missing username.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/AppError'
-  /my/groups:
+                "$ref": "#/components/schemas/AppError"
+  "/my/groups":
     get:
       summary: Gets all the groups of an user's collection.
       tags:
-        - User
+      - User
       responses:
         '200':
-          description: If everything goes right.
+          description: An Array with all of the groups as objects.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/GroupList'
+                "$ref": "#/components/schemas/GroupList"
         '401':
           description: Missing or Invalid API token. The user is not authenticated.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/AppError'
+                "$ref": "#/components/schemas/AppError"
       'security:':
-        - bearerAuth: []
+      - bearerAuth: []
     post:
       tags:
-        - User
+      - User
       summary: Creates a new Game's Group.
       requestBody:
         description: Create group with a name and description
@@ -119,196 +120,194 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/GroupCreator'
+              "$ref": "#/components/schemas/GroupCreator"
       responses:
         '200':
           description: Group successfuly created
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/GroupResponse'
+                "$ref": "#/components/schemas/GroupCreatorResponse"
         '400':
           description: Missing group name or group already exists.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/AppError'
+                "$ref": "#/components/schemas/AppError"
         '401':
           description: Missing or Invalid API token. The user is not authenticated.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/AppError'
-  /my/groups/edit:
+                "$ref": "#/components/schemas/AppError"
+  "/my/groups/edit":
     post:
       tags:
-        - User
+      - User
       summary: Edits a group from an user's collection.
       requestBody:
-        description:
-          Group name to edit and the respective new group name and new
+        description: Group name to edit and the respective new group name and new
           description
         required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/GroupOperationResponse'
+              "$ref": "#/components/schemas/GroupEditBody"
       responses:
         '200':
           description: The group got succesfully edited
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/GroupResponse'
+                "$ref": "#/components/schemas/GroupEditResponse"
         '400':
-          description:
-            Invalid or missing group name to edit or missing new group name and
-            new description.
+          description: Invalid or missing group name to edit or missing new group
+            name and new description.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/AppError'
+                "$ref": "#/components/schemas/AppError"
         '401':
           description: Missing or Invalid API token. The user is not authenticated.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/AppError'
-  /my/groups/game:
+                "$ref": "#/components/schemas/AppError"
+  "/my/groups/game":
     post:
       tags:
-        - User
+      - User
       summary: Adds a game to a group.
       requestBody:
-        description: Group and game names.
+        description: Group and game ids.
         required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/GameAddition'
+              "$ref": "#/components/schemas/GameAddition"
       responses:
         '200':
           description: The game is now in the group
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/GameOperationResponse'
+                "$ref": "#/components/schemas/GameOperationResponse"
         '400':
           description: Group or game name's missing.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/AppError'
+                "$ref": "#/components/schemas/AppError"
         '401':
           description: Missing or Invalid API token. The user is not authenticated.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/AppError'
-  '/my/groups/{groupName}':
+                "$ref": "#/components/schemas/AppError"
+  "/my/groups/{groupID}":
     get:
       summary: Gets a group of an user's collection.
       'security:':
-        - bearerAuth: []
+      - bearerAuth: []
       tags:
-        - User
+      - User
       parameters:
-        - name: groupName
-          in: path
-          required: true
-          description: Group's name to search for.
-          schema:
-            type: string
-          example: MyGames
+      - name: groupID
+        in: path
+        required: true
+        description: Group to delete.
+        schema:
+          type: string
+        example: '12312314'
       responses:
         '200':
           description: If everything goes right.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/GroupResponse'
+                "$ref": "#/components/schemas/GroupResponse"
         '400':
           description: Inexistant Group in user's collection.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/AppError'
+                "$ref": "#/components/schemas/AppError"
         '401':
           description: Missing or Invalid API token. The user is not authenticated.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/AppError'
+                "$ref": "#/components/schemas/AppError"
     delete:
       tags:
-        - User
+      - User
       summary: Deletes a group from a user's collection.
       parameters:
-        - name: groupName
-          in: path
-          required: true
-          description: Group to delete.
-          schema:
-            type: string
-          example: MyGames
+      - name: groupID
+        in: path
+        required: true
+        description: Group to delete.
+        schema:
+          type: string
+        example: '12312314'
       responses:
         '200':
           description: If everything goes right.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/GroupNameResponse'
+                "$ref": "#/components/schemas/GroupDeleteResponse"
         '400':
           description: Invalid group's name.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/AppError'
+                "$ref": "#/components/schemas/AppError"
         '401':
           description: Missing or Invalid API token. The user is not authenticated.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/AppError'
-  '/my/groups/{groupName}/{gameName}':
+                "$ref": "#/components/schemas/AppError"
+  "/my/groups/{groupID}/{gameID}":
     delete:
       tags:
-        - User
+      - User
       summary: Deletes a game from an user's collection group.
       parameters:
-        - name: groupName
-          in: path
-          required: true
-          description: Group's name that contains the game to delete.
-          schema:
-            type: string
-          example: MyGames
-        - name: gameName
-          in: path
-          required: true
-          description: Game's name to delete.
-          schema:
-            type: string
-          example: Pandemic
+      - name: groupID
+        in: path
+        required: true
+        description: Group's ID that contains the game to delete.
+        schema:
+          type: string
+        example: '12312341'
+      - name: gameID
+        in: path
+        required: true
+        description: Game's ID to delete.
+        schema:
+          type: string
+        example: '21342115133412'
       responses:
         '200':
           description: If everything goes right.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/GameOperationResponse'
+                "$ref": "#/components/schemas/GameOperationResponse"
         '400':
           description: Invalid group or game's name.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/AppError'
+                "$ref": "#/components/schemas/AppError"
         '401':
           description: Missing or Invalid API token. The user is not authenticated.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/AppError'
+                "$ref": "#/components/schemas/AppError"
 components:
   securitySchemes:
     bearerAuth:
@@ -319,18 +318,18 @@ components:
       description: Additional information about the error.
       nullable: true
       anyOf:
-        - type: object
-        - type: string
-        - type: integer
-        - type: number
+      - type: object
+      - type: string
+      - type: integer
+      - type: number
       example: Error ocurred.
     AppError:
       type: object
       description: Application error
       required:
-        - code
-        - name
-        - message
+      - code
+      - name
+      - message
       properties:
         code:
           type: number
@@ -346,16 +345,22 @@ components:
           description: Error description message
           example: An error occurred
         info:
-          $ref: '#/components/schemas/AppErrorInfo'
+          "$ref": "#/components/schemas/AppErrorInfo"
     GameOperationResponse:
       type: object
       description: Game operation completed successfully.
-      required:
-        - gameName
       properties:
-        gameName:
-          type: string
-          example: Pandemic
+        success:
+          type: boolean
+        responseObject:
+          type: object
+          properties:
+            groupName:
+              type: string
+              example: groupNameExample
+            gameName:
+              type: string
+              example: Pandemic
     Game:
       type: object
       description: Game data
@@ -367,7 +372,7 @@ components:
         url:
           type: string
           description: Board game atlas game's url.
-          example: 'https://www.boardgameatlas.com/game/j8LdPFmePE/7-wonders-duel'
+          example: https://www.boardgameatlas.com/game/j8LdPFmePE/7-wonders-duel
         name:
           type: string
           description: Board game's name.
@@ -391,18 +396,16 @@ components:
         description:
           type: string
           description: A preview of the description of the game
-          example: 
-            7 Wonders Duel  is a fast-paced, two-player edition of Antoine
+          example: 7 Wonders Duel  is a fast-paced, two-player edition of Antoine
             Bauza's award-winning civilization-building game.
         image_url:
           type: string
           description: Board game's image url
-          example:
-            https://s3-us-west-1.amazonaws.com/5cc.images/games/uploaded/1629323024736.jpg
+          example: https://s3-us-west-1.amazonaws.com/5cc.images/games/uploaded/1629323024736.jpg
         rules_url:
           type: string
           description: Board game's rules url
-          example: 'http://www.7wondersduel.com/files/rules/7-Wonders-Duel-Rules-US.pdf'
+          example: http://www.7wondersduel.com/files/rules/7-Wonders-Duel-Rules-US.pdf
         amazon_rank:
           type: int32
           description: Board game's amazon rank
@@ -410,8 +413,7 @@ components:
         official_url:
           type: string
           description: Board game's official url
-          example: 
-            http://www.7wondersduel.com/7wonders-duel.php?utm_source=boardgameatlas.com&utm_medium=search&utm_campaign=bga_ads
+          example: http://www.7wondersduel.com/7wonders-duel.php?utm_source=boardgameatlas.com&utm_medium=search&utm_campaign=bga_ads
         borga_rank:
           type: int32
           description: Board game atlas game's rank
@@ -423,21 +425,23 @@ components:
         games:
           type: array
           items:
-            $ref: '#/components/schemas/Game'
+            "$ref": "#/components/schemas/Game"
     GameResponse:
       type: object
       description: Response with a game
       properties:
         game:
-          $ref: '#/components/schemas/Game'
+          "$ref": "#/components/schemas/Game"
     GameAddition:
       type: object
-      description: Group name and game name.
+      description: Group id and game id.
       properties:
-        groupName:
+        groupID:
           type: string
-        gameName:
+          example: '1231234124'
+        gameID:
           type: string
+          example: 6FmFeux5xH
     Group:
       type: object
       description: User's group
@@ -450,12 +454,15 @@ components:
           type: string
           description: Group's description.
           example: Jogos que já joguei
-        gameNames:
+        games:
           type: array
           items:
             type: string
             description: Game's name identifier.
             example: monopoly
+        id:
+          type: string
+          example: '12341235'
     GroupList:
       type: object
       description: User's group
@@ -463,35 +470,107 @@ components:
         groups:
           type: array
           items:
-            $ref: '#/components/schemas/Group'
-    GroupOperationResponse:
+            "$ref": "#/components/schemas/Group"
+    GroupListElement:
       type: object
-      description: Game operation completed successfully.
-      required:
-        - groupName
+      description: User's group
       properties:
-        gameName:
+        groups:
+          type: array
+          items:
+            "$ref": "#/components/schemas/Group"
+    GroupEditResponse:
+      type: object
+      description: Game edition completed successfully.
+      properties:
+        success:
+          type: boolean
+        groupObject:
+          type: object
+          properties:
+            name:
+              type: string
+              example: New Name
+            description:
+              type: string
+              example: New Description
+    GroupEditBody:
+      type: object
+      description: Game to edit body.
+      required:
+      - id
+      properties:
+        id:
           type: string
+          example: '128364192'
         newGroupName:
           type: string
+          example: New Name
         newGroupDescription:
           type: string
+          example: New Description
     GroupResponse:
       type: object
       description: Response with a group.
       properties:
         group:
-          $ref: '#/components/schemas/Group'
+          type: object
+          description: User's group
+          properties:
+            name:
+              type: string
+              description: Game's name identifier.
+              example: MyGames
+            description:
+              type: string
+              description: Group's description.
+              example: Jogos que já joguei
+            games:
+              type: array
+              items:
+                type: string
+                description: Game's name identifier.
+                example: monopoly
     GroupCreator:
       type: object
-      description: Object with a group name and description.
+      description: Object with a group Id and group name and description.
       properties:
-        groupName:
+        name:
           type: string
           example: MyGames
-        groupDescription:
+        description:
           type: string
           example: Jogos que já joguei
+    GroupCreatorResponse:
+      type: object
+      description: Object with a group Id and group name and description.
+      properties:
+        success:
+          type: boolean
+        groupObject:
+          type: object
+          properties:
+            name:
+              type: string
+              example: MyGames
+            description:
+              type: string
+              example: Jogos que já joguei
+            id:
+              type: string
+              example: '1231234124'
+    GroupDeleteResponse:
+      type: object
+      description: Game deleted successfully.
+      properties:
+        success:
+          type: boolean
+        groupObject:
+          type: object
+          properties:
+            name:
+              type: string
+              example: Group's name deleted.
     UserRegister:
       type: object
       description: Response with a user and his token
