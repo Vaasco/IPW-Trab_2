@@ -66,10 +66,13 @@ module.exports = (games_data, data_mem) => {
      * @returns the requested game.
      */
     async function getGameWithName(gameName){
-        const game = await games_data.findGameByName(gameName)
-        const gameExists = await data_mem.hasGameByName(gameName)
-        if(!gameExists) await data_mem.addGameToCollection(game)
-        return { game }
+        const games = await games_data.findGameByName(gameName)
+        games.forEach(async(game) => {
+            const gameExists = await data_mem.hasGameByName(gameName)
+            if(!gameExists) await data_mem.addGameToCollection(game)
+        })
+        
+        return { games }
 
     }
 

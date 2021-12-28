@@ -80,7 +80,7 @@ function makeGameObj(gameInfo){
         max_players: gameInfo.max_players,
         min_age: gameInfo.min_age,
         description: gameInfo.description_preview,                                      
-        image_url: gameInfo.image_url,
+        image_url: gameInfo.thumb_url,
         rules_url: gameInfo.rules_url,
         amazon_rank: gameInfo.amazon_rank,
         official_url: gameInfo.official_url,
@@ -108,8 +108,8 @@ async function findGameByName(gameName){
     return do_fetch(uri)
     .then(answer => {
         const games = answer.games
-       if(games.length > 0)
-            return makeGameObj(games[0])
+       if(games.length > 0)  
+            return games.map(makeGameObj)
         else
             throw errors.NOT_FOUND(GAME_NOT_FOUND)
     })

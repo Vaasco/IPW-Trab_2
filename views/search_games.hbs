@@ -1,0 +1,41 @@
+<h1>{{header}}</h1>
+
+{{#if gameName}}
+	<p>Search: {{gameName}}</p>
+{{/if}}
+
+
+{{#if games}}
+
+    {{#each games}}
+
+        <table>
+            <tr>
+                <td>Name:</td>
+                <td>{{name}}</td>
+            </tr>
+            <tr>
+                <td>Url:</td>
+                <td><a href={{url}}>Board Game Atlas' page</a></td>
+            </tr>
+            <tr>
+                <td>Rank:</td>
+                <td>{{borga_rank}}</td>
+            </tr>
+            <tr>
+                <td>Price:</td>
+                <td>{{price}} $</td>
+            </tr>
+        </table>
+        
+
+        <form action='/game' method='POST'>
+            <input type='hidden' name='gameId' value='{{id}}'>
+            <input type='submit' value='Save'>
+        </form>
+        <hr>
+
+    {{/each}}
+
+{{/if}}
+
