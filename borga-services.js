@@ -88,7 +88,7 @@ module.exports = (games_data, data_mem) => {
     
     /**
      * Gets the details of a group.
-     * @param groupName name of the group to get the details.
+     * @param groupID group to get the details from.
      * @param token identifies the user that wants to get the details of one of his groups.
      * @returns an object with the group name.
      */
@@ -118,7 +118,7 @@ module.exports = (games_data, data_mem) => {
     
     /**
      * Edits the groups of a user.
-     * @param groupName name of the group to be edited.
+     * @param groupID  group to be edited.
      * @param newGroupName name to replace with the already existing one.
      * @param newDescription description to replace with the already existing one.
      * @param token identifies the user that wants to edit the group.
@@ -129,21 +129,20 @@ module.exports = (games_data, data_mem) => {
         if(!groupID) throw errors.MISSING_PARAM(MISSING_GROUP_ID)
         if(!newGroupName && !newDescription) throw errors.MISSING_PARAM(NAME_OR_DESCRIPTION_REQUIRED)
         await requireGroup(groupID, user)
-        const group = await data_mem.editGroup(groupID, newGroupName, newDescription, user) 
-        return { group }
+        const groupResponse = await data_mem.editGroup(groupID, newGroupName, newDescription, user) 
+        return groupResponse
     }
 
     /**
      * Deletes a group.
-     * @param groupName name of the group to be deleted. 
+     * @param groupID group to be deleted. 
      * @param token identifies the user that wants to delete one of his groups.
      * @returns an object with the groupName if deleted
      */
     async function deleteGroup(groupID, token){
         const user = await getUsername(token)
         await requireGroup(groupID, user)
-        await data_mem.deleteGroup(groupID, user)
-        return { groupID }
+        return await data_mem.deleteGroup(groupID, user)
     }
 
 
@@ -164,10 +163,9 @@ module.exports = (games_data, data_mem) => {
 
         const gameExists = await data_mem.hasGame(gameID)
         if(!gameExists) throw errors.INVALID_PARAM()
-        
         const result = await data_mem.addGameToGroup(groupID, gameID, user)
         if(!result.success) throw errors.INVALID_PARAM(GAME_ALREADY_IN_GROUP)
-        return {gameID: result.gameAdded} 
+        return result
     }
 
     /**
@@ -182,7 +180,7 @@ module.exports = (games_data, data_mem) => {
         await requireGroup(groupID, user)
         const result = await data_mem.deleteGameFromGroup(groupID, gameID, user)
         if(!result.success) throw errors.INVALID_PARAM(GAME_NOT_IN_GROUP)
-        return {gameName: result.gameName} 
+        return result
     }
     
     return {

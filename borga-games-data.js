@@ -84,7 +84,9 @@ function makeGameObj(gameInfo){
         rules_url: gameInfo.rules_url,
         amazon_rank: gameInfo.amazon_rank,
         official_url: gameInfo.official_url,
-        borga_rank: gameInfo.rank
+        borga_rank: gameInfo.rank,
+        mechanics: gameInfo.mechanics,
+        categories: gameInfo.categories
     })
 }
 
@@ -106,12 +108,13 @@ async function findGameByName(gameName){
     return do_fetch(uri)
     .then(answer => {
         const games = answer.games
-       if(games.length > 0) 
+       if(games.length > 0)
             return makeGameObj(games[0])
         else
             throw errors.NOT_FOUND(GAME_NOT_FOUND)
     })
 }
+
 
 module.exports = {
     findPopularGames: findPopularGames,

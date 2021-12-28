@@ -21,7 +21,7 @@ const tokens = {
 }
 
 /**Object with the requested games.*/
-const gameCollection = {games: {}}
+const gameCollection = {games: {}}  
 
 function generateRandomId(){
     return Math.floor(Math.random() * Math.floor(Math.random() * Date.now())).toString()
@@ -62,7 +62,7 @@ async function addGameToCollection(game){
 
 /**
  * Gets the game from the collection
- * @param gameName of the game to get
+ * @param gameID of the game to get
  * @returns game from the collection 
  */
 async function getGame(gameID){
@@ -109,7 +109,7 @@ async function createNewGroup(groupName, groupDescription, userName){
     }
     users[userName].groups[groupGeneratedId] = createdGroup
     
-    return {id:groupGeneratedId, groupObject: {name: createdGroup.name, description: createdGroup.description}}
+    return {success: true, groupObject: {name: createdGroup.name, description: createdGroup.description, id:groupGeneratedId}}
 }
 
 /**
@@ -140,10 +140,11 @@ async function editGroup(groupID, givenName, newDescription, userName){
     const groupToEdit = userToEdit.groups[groupID]
     const desc = newDescription || groupToEdit.description 
     const newName = givenName || groupToEdit.groupName
-    const games = groupToEdit.gameNames
     groupToEdit.name = newName
-    groupToEdit.description = desc  
-    return groupToEdit
+    groupToEdit.description = desc
+    const returnCopy = {...groupToEdit}  
+    delete returnCopy.games
+    return {success: true, groupObject: returnCopy}
 }
 
 /**
@@ -157,8 +158,9 @@ async function addGameToGroup(groupID, gameID, userName){
     const groupNeeded = users[userName].groups[groupID]
     if(groupNeeded.games.includes(gameID)) return {success: false}
     groupNeeded.games.push(gameID)
-    return {success: true, gameAdded: gameID}
-}
+    const gameToAdd = await getGame(gameID)
+    return {success: true, responseObject: {groupName: groupNeeded.name ,gameName: gameToAdd.name}}
+} 
 
 /**
  * Gets the details of a group
@@ -177,12 +179,14 @@ async function groupDetails(groupID, userName){
  * @returns true if the group was deleted succesfully.
  */
 async function deleteGroup(groupID, userName){
+    const groupName = users[userName].groups[groupID].name
     delete users[userName].groups[groupID]
+    return {success: true, groupObject: {name: groupName}}
 }
 
 /**
 * Deletes a game from a group
-* @param groupName of the group that will have a game deleted.
+* @param groupName of the group that will have a game delete.
 * @param gameName of the game that the user wants to delete.
 * @param userName of the user that wants to delete it.
 * @returns true if the game was deleted succesfully.
@@ -190,8 +194,10 @@ async function deleteGroup(groupID, userName){
 async function deleteGameFromGroup(groupID, gameID, userName){
     const gameArray = users[userName].groups[groupID].games
     if(!gameArray.includes(gameID)) return {success: false}
-    users[userName].groups[groupID].games = gameArray.filter(id => gameID !== id)
-    return {success: true, gameName: gameCollection.games[gameID].name}
+    const group =  users[userName].groups[groupID]
+    group.games = gameArray.filter(id => gameID !== id)
+    const gameRemoved = await getGame(gameID)
+    return {success: true, responseObject: {groupName: group.name, gameName: gameRemoved.name}}
 } 
 
 /**
@@ -204,7 +210,7 @@ async function tokenToUsername(token) {
 }
 
 /**
- * 
+ * Erases the content of the grops inside the user object
  */
  async function reset() {
 	Object.values(users).forEach(user => {

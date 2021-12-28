@@ -126,7 +126,7 @@ module.exports = function (services){
         try{
             const body = req.body
             const gameID = body.gameID
-            const groupID = body.id
+            const groupID = body.groupID
             const added = await services.addGameToGroup(groupID, gameID, getBearerToken(req))
             res.json(added)
         }
