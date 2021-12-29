@@ -348,7 +348,7 @@
                         "name": "groupID",
                         "in": "path",
                         "required": true,
-                        "description": "Group to delete.",
+                        "description": "Respective Group.",
                         "schema": {
                             "type": "string"
                         },
@@ -705,8 +705,7 @@
                         "type": "array",
                         "items":{
                             "type": "string",
-                            "description": "Game's name identifier.",
-                            "example": "monopoly"
+                            "example": "1231823981"
                         }
                     },
                     "id":{

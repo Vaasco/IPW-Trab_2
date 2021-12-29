@@ -1,0 +1,28 @@
+
+
+{{#if noGroups}}
+    <h1>No groups</h1>
+{{else}}
+    <h1>My Groups</h1>
+    <ul>
+        {{#each groups}}
+            <li>
+                {{name}}
+                <form>
+                    <input type="submit" formaction="/groups/{{id}}" value="Details">
+                </form>
+            </li>
+        {{/each}}
+    </ul>    
+{{/if}}
+
+<hr>
+
+<form action='/groups' method='POST'>
+        <h2>Create a group: </h2>
+        <label for="groupName">Name: </label><br>
+        <input type='text' id='groupName' name='groupName' required><br><br>
+        <label for="groupDescription">Description: </label><br>
+        <input type='text' id='groupDescription' name='groupDescription'><br><br>
+        <input type='submit' value='Add'>
+</form>

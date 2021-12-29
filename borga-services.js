@@ -83,7 +83,7 @@ module.exports = (games_data, data_mem) => {
      * @param token identifies the user that wants to get the groups. 
      * @returns an object with the list with the groups of the user associated to the given token. 
      */
-    async function getGroups(token){
+    async function getMyGroups(token){
         const userName = await getUsername(token)
         const groups = await data_mem.getGroups(userName)
         return {groups}
@@ -160,7 +160,7 @@ module.exports = (games_data, data_mem) => {
      */
      async function addGameToGroup(groupID, gameID, token){   
         if(!groupID) throw errors.MISSING_PARAM(MISSING_GROUP_ID) 
-        if(!gameID) throw errors.MISSING_PARAM(MISSING_GAME_ID)// -> NAO ESQUECER DE ALTERAR PRA GAME!
+        if(!gameID) throw errors.MISSING_PARAM(MISSING_GAME_ID)
         const user = await getUsername(token)
         await requireGroup(groupID, user)
 
@@ -191,7 +191,7 @@ module.exports = (games_data, data_mem) => {
         getGameWithName: getGameWithName,
         addGameToGroup: addGameToGroup,
         createNewGroup: createNewGroup,
-        getMyGroups: getGroups,
+        getMyGroups: getMyGroups,
         editMyGroup: editGroup,
         getDetails: groupDetails,
         deleteGroup: deleteGroup,

@@ -115,6 +115,7 @@ module.exports = function (guest){
         return {success: true, groupObject: {name: createdGroup.name, description: createdGroup.description, id:groupGeneratedId}}
     }
 
+
     /**
      * Gets the groups of a user
      * @param userName user that wants to get the groups
@@ -172,7 +173,15 @@ module.exports = function (guest){
      * @returns the details of the group.
      */
     async function groupDetails(groupID, userName){
-        return users[userName].groups[groupID]
+        const group = users[userName].groups[groupID]
+        const groupCopy = {...group}
+        const gamesPromise = group.games.map((async (id) => {
+            const game = await getGame(id)
+            const name = game.name
+            return {name}            
+        }))
+        groupCopy.games = await Promise.all(gamesPromise)
+        return groupCopy
     }
 
     /**

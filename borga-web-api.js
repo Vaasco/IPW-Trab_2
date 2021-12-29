@@ -193,7 +193,7 @@ module.exports = function (services){
      * @param req the request 
      * @param res the response 
      */
-    async function deleteGameByName(req, res){
+    async function deleteGameFromGroup(req, res){
         try{
             const params = req.params
             const gameID = params.gameID
@@ -215,6 +215,14 @@ module.exports = function (services){
             const userName = req.body.userName
             const newUser = await services.createNewUser(userName)
             res.json(newUser)        
+        }catch(err){
+            onError(res, err)
+        }
+    }
+
+    async function getGameDetails(req, res){
+        try{
+
         }catch(err){
             onError(res, err)
         }
@@ -248,8 +256,9 @@ module.exports = function (services){
     router.get("/my/groups/:groupID", getGroupDetails)
     router.delete("/my/groups/:groupID", deleteGroupById)
 
-    // Resource /my/groups/<groupName>/<gameName>
-    router.delete("/my/groups/:groupID/:gameID", deleteGameByName)
+    // Resource /my/groups/<groupID>/<gameID>
+    router.get("/my/groups/:groupID/:gameID", getGameDetails)
+    router.delete("/my/groups/:groupID/:gameID", deleteGameFromGroup)
 
     return router
 }

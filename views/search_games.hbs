@@ -1,7 +1,7 @@
 <h1>{{header}}</h1>
 
 {{#if gameName}}
-	<p>Search: {{gameName}}</p>
+	<h3>Search: {{gameName}}</h3>
 {{/if}}
 
 
@@ -16,7 +16,7 @@
             </tr>
             <tr>
                 <td>Url:</td>
-                <td><a href={{url}}>Board Game Atlas' page</a></td>
+                <td><a href={{url}} target="_blank">Board Game Atlas' page</a></td>
             </tr>
             <tr>
                 <td>Rank:</td>
@@ -29,8 +29,8 @@
         </table>
         
 
-        <form action='/game' method='POST'>
-            <input type='hidden' name='gameId' value='{{id}}'>
+        <form action='/group-select' method='POST'>
+            <input type='hidden' name='gameID' value='{{id}}'>
             <input type='submit' value='Save'>
         </form>
         <hr>

@@ -1,0 +1,28 @@
+{{#if group}}
+    <table>
+        <tr>
+            <td>Name:</td>
+            <td>{{group.name}}</td>
+        </tr>
+        <tr>
+            <td>Description:</td>
+            <td>{{group.description}}</td>
+        </tr>
+        <tr>
+            <td>Games:</td>
+            <td>
+                {{#with group.games}}
+                    {{#each this}}
+                        {{this.name}}
+                        {{#unless @last}}|{{/unless}} 
+                    {{else}}
+                        No games
+                    {{/each}}
+                {{/with}}
+            </td>
+        </tr>
+    </table>
+{{/if}}
+
+
+
