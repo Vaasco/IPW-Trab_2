@@ -66,14 +66,24 @@ module.exports = (games_data, data_mem) => {
      * @returns the requested game.
      */
     async function getGameWithName(gameName){
+        const empty = await data_mem.collectionIsEmpty()
+        if(empty) await saveGameInfo()
         const games = await games_data.findGameByName(gameName)
         games.forEach(async(game) => {
             const gameExists = await data_mem.hasGameByName(gameName)
             if(!gameExists) await data_mem.addGameToCollection(game)
         })
-        
         return { games }
+    }
 
+    async function getGameDetails(gameID){
+        if(!gameID) throw errors.MISSING_PARAM(MISSING_GAME_ID) 
+        const game = await data_mem.getGame(gameID)
+        const mechanics = data_mem.getMechanics(gameID)
+        const categories = data_mem.getCategories(gameID)
+        game.mechanics = await mechanics
+        game.categories = await categories
+        return {game}
     }
 
      /**            Group Info Access            **/
@@ -185,6 +195,13 @@ module.exports = (games_data, data_mem) => {
         if(!result.success) throw errors.INVALID_PARAM(GAME_NOT_IN_GROUP)
         return result
     }
+
+    async function saveGameInfo(){
+        const mechanics = await games_data.getMechanics()
+        const categories = await games_data.getCategories()
+        await data_mem.saveMechanics(mechanics)
+        await data_mem.saveCategories(categories)
+    }
     
     return {
         getPopularGames: getPopularGames,
@@ -193,9 +210,11 @@ module.exports = (games_data, data_mem) => {
         createNewGroup: createNewGroup,
         getMyGroups: getMyGroups,
         editMyGroup: editGroup,
-        getDetails: groupDetails,
+        groupDetails: groupDetails,
+        getGameDetails: getGameDetails,
         deleteGroup: deleteGroup,
         deleteGameByName: deleteGameByName,
         createNewUser: createNewUser
     }
+
 }

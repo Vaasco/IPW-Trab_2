@@ -6,7 +6,8 @@
   "scripts": {
     "server": "nodemon borga-launch.js",
     "test": "jest",
-    "start": "node borga-launch.js"
+    "start": "node borga-launch.js",
+    "warnings": "node --trace-warnings borga-launch.js"
   },
   "keywords": [],
   "author": "",

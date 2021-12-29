@@ -79,7 +79,7 @@ module.exports = function (services, guest_token) {
 	async function getMyGroupDetails(req,res){
 		try{
 			const groupID = req.params.groupID
-			const detailsResponse = await services.getDetails(groupID, getToken())
+			const detailsResponse = await services.groupDetails(groupID, getToken())
 			const group = detailsResponse.group
 			console.log(group)
 			res.render("group_details", {group})

@@ -417,7 +417,7 @@
                        }
                      },
                      "400":{
-                        "description": "Invalid group's name.",
+                        "description": "Invalid group's ID.",
                         "content": {
                           "application/json": {
                             "schema": {
@@ -479,7 +479,7 @@
                       }
                     },
                     "400":{
-                        "description": "Invalid group or game's name.",
+                        "description": "Invalid group or game's ID.",
                         "content": {
                           "application/json": {
                             "schema": {
@@ -496,6 +496,58 @@
                               "$ref": "#/components/schemas/AppError"
                             }
                           }
+                        }
+                    }
+                }    
+            }
+        },
+        "/games/{gameID}":{
+            "get":{
+                "tags": [
+                    "User"
+                ],
+                "summary": "Gets the details of a game.",
+                "parameters": [
+                    {
+                        "name": "gameID",
+                        "in": "path",
+                        "required": true,
+                        "description": "Game's ID to get the details.",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "example": "21342115133412"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                    "description": "If everything goes right.",
+                    "content":{
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/GameResponse"
+                            }
+                        }
+                    }
+                    },
+                    "400":{
+                        "description": "Missing Game's ID.",
+                        "content": {
+                        "application/json": {
+                            "schema": {
+                            "$ref": "#/components/schemas/AppError"
+                            }
+                        }
+                        }
+                    },
+                    "401": {
+                        "description": "Missing or Invalid API token. The user is not authenticated.",
+                        "content": {
+                        "application/json": {
+                            "schema": {
+                            "$ref": "#/components/schemas/AppError"
+                            }
+                        }
                         }
                     }
                 }    

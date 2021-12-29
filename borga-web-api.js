@@ -180,7 +180,7 @@ module.exports = function (services){
     async function getGroupDetails(req,res){
         try{
             const groupID = req.params.groupID
-            const group = await services.getDetails(groupID, getBearerToken(req))
+            const group = await services.groupDetails(groupID, getBearerToken(req))
             res.json(group)
         }catch(err){
             onError(res, err)
@@ -222,7 +222,8 @@ module.exports = function (services){
 
     async function getGameDetails(req, res){
         try{
-
+            const details = await services.getGameDetails(req.params.gameID, getBearerToken(req))
+            res.json(details)
         }catch(err){
             onError(res, err)
         }
@@ -256,8 +257,9 @@ module.exports = function (services){
     router.get("/my/groups/:groupID", getGroupDetails)
     router.delete("/my/groups/:groupID", deleteGroupById)
 
+    router.get("/games/:gameID", getGameDetails)
+
     // Resource /my/groups/<groupID>/<gameID>
-    router.get("/my/groups/:groupID/:gameID", getGameDetails)
     router.delete("/my/groups/:groupID/:gameID", deleteGameFromGroup)
 
     return router

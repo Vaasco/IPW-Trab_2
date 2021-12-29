@@ -11,6 +11,7 @@ const errors = require('./borga-errors.js');
  */
 const ATLAS_BORGA_ID = process.env.ATLAS_CLIENT_ID
 const GAMES_BASE_URI = "https://api.boardgameatlas.com/api/search?"
+const GAMES_ALTERNATE_URI = "https://api.boardgameatlas.com/api/game/"
 const CLIENT_QUERY = `&client_id=${ATLAS_BORGA_ID}`
 const HTTP_SERVER_ERROR = 5;
 const GAME_NOT_FOUND = `Game does not exist.`
@@ -115,9 +116,26 @@ async function findGameByName(gameName){
     })
 }
 
+async function getCategories(){
+    const uri = GAMES_ALTERNATE_URI+`categories?`+CLIENT_QUERY
+    return do_fetch(uri)
+    .then(res => {
+        return res.categories
+    })
+}
+
+async function getMechanics(){
+    const uri = GAMES_ALTERNATE_URI+`mechanics?`+CLIENT_QUERY
+    return do_fetch(uri)
+    .then(res => {
+        return res.mechanics
+    })
+}
 
 module.exports = {
     findPopularGames: findPopularGames,
-    findGameByName: findGameByName
+    findGameByName: findGameByName,
+    getMechanics: getMechanics,
+    getCategories: getCategories
 }
 

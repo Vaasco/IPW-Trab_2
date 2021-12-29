@@ -69,7 +69,9 @@ module.exports = function (guest){
      * @returns game from the collection 
      */
     async function getGame(gameID){
-        return gameCollection.games[gameID]
+        const game = gameCollection.games[gameID]
+        if(!game) throw errors.NOT_FOUND("Game not found!")
+        return {...game}
     }
 
     /**
@@ -230,6 +232,36 @@ module.exports = function (guest){
         });
     }
 
+    async function collectionIsEmpty(){
+        return Object.entries(gameCollection.games).length === 0
+    }
+
+    async function saveMechanics(mechanics){
+        gameCollection.mechanics = mechanics
+    }
+
+    async function saveCategories(categories){
+        gameCollection.categories = categories
+    }
+
+    async function getMechanics(gameID){
+        return await getInfoNames(gameID, 'mechanics')
+    }
+
+    async function getCategories(gameID){
+        return await getInfoNames(gameID, 'categories')
+    }
+
+    async function getInfoNames(gameID, info){
+        const game = await getGame(gameID)
+        const infoIDs = game[info].map((obj) => obj.id)
+        const gameInfoSet = new Set(infoIDs)
+        const gameInfoObjects = gameCollection[info].filter((infoElem) => {
+            return gameInfoSet.has(infoElem.id)
+        })
+        return gameInfoObjects.map((elem) => elem.name)
+    }
+
     return {
         createNewGroup: createNewGroup,
         getGroups: getGroups,
@@ -245,6 +277,11 @@ module.exports = function (guest){
         deleteGameFromGroup: deleteGameFromGroup,
         createNewUser: createNewUser,
         tokenToUsername: tokenToUsername,
+        saveCategories: saveCategories,
+        saveMechanics: saveMechanics,
+        collectionIsEmpty: collectionIsEmpty,
+        getMechanics: getMechanics,
+        getCategories: getCategories,
         reset: reset  
     }
 }
