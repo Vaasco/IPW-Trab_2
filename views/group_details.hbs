@@ -14,6 +14,9 @@
                 {{#with group.games}}
                     {{#each this}}
                         {{this.name}}
+                        <form>
+                            <input type='submit' formaction="/games/{{this.id}}" value='Details'>
+                        </form>
                         {{#unless @last}}|{{/unless}} 
                     {{else}}
                         No games

@@ -81,8 +81,18 @@ module.exports = function (services, guest_token) {
 			const groupID = req.params.groupID
 			const detailsResponse = await services.groupDetails(groupID, getToken())
 			const group = detailsResponse.group
-			console.log(group)
 			res.render("group_details", {group})
+		}catch(err){
+			console.log(err)
+		}
+	}
+
+	async function getGameDetails(req, res){
+		try{
+			const gameID = req.params.gameID
+			const detailsResponse = await services.getGameDetails(gameID, getToken())
+			const game = detailsResponse.game
+			res.render('game_details', {game})
 		}catch(err){
 			console.log(err)
 		}
@@ -107,6 +117,8 @@ module.exports = function (services, guest_token) {
 	router.get('/groups/:groupID', getMyGroupDetails)
 
 	router.post('/group-select', getGroupSelect)
+
+	router.get('/games/:gameID', getGameDetails)
 
 	return router
 }

@@ -6,9 +6,7 @@
 
 
 {{#if games}}
-
     {{#each games}}
-
         <table>
             <tr>
                 <td>Name:</td>
@@ -26,16 +24,22 @@
                 <td>Price:</td>
                 <td>{{price}} $</td>
             </tr>
+            
+             <tr>
+                 <td>
+                    <form>
+                        <input type='submit' formaction="/games/{{id}}" value='Details'>
+                    </form> 
+                </td>
+                <td> 
+                    <form action='/group-select' method='POST'>
+                        <input type='hidden' name='gameID' value='{{id}}'>
+                        <input type='submit' value='Save'>
+                    </form>
+                </td>
+            </tr> 
         </table>
-        
-
-        <form action='/group-select' method='POST'>
-            <input type='hidden' name='gameID' value='{{id}}'>
-            <input type='submit' value='Save'>
-        </form>
         <hr>
-
     {{/each}}
-
 {{/if}}
 
