@@ -47,6 +47,15 @@ module.exports = function (guest){
     }
 
     /**
+     * Gives the user name linked to a token
+     * @param token 
+     * @returns the user name
+     */
+     async function tokenToUsername(token) {
+        return tokens[token];
+    }
+
+    /**
      * Cheks if already exists a user with {name} in {users}
      */
     async function hasUser(name){
@@ -177,11 +186,11 @@ module.exports = function (guest){
     async function groupDetails(groupID, userName){
         const group = users[userName].groups[groupID]
         const groupCopy = {...group}
-        const gamesPromise = group.games.map((async (id) => {
+        const gamesPromise = group.games.map(async (id) => {
             const game = await getGame(id)
             const name = game.name
-            return {name}            
-        }))
+            return {id, name}            
+        })
         groupCopy.games = await Promise.all(gamesPromise)
         return groupCopy
     }
@@ -214,14 +223,7 @@ module.exports = function (guest){
         return {success: true, responseObject: {groupName: group.name, gameName: gameRemoved.name}}
     } 
 
-    /**
-     * Gives the user name linked to a token
-     * @param token 
-     * @returns the user name
-     */
-    async function tokenToUsername(token) {
-        return tokens[token];
-    }
+    
 
     /**
      * Erases the content of the grops inside the user object

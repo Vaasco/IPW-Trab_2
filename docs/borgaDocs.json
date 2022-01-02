@@ -839,27 +839,36 @@
                 "properties": {
                     "group": {
                         "type": "object",
-                "description": "User's group",
-                "properties": {
-                    "name": {
-                        "type": "string",
-                        "description": "Game's name identifier.",
-                        "example": "MyGames"
-                    },
-                    "description": {
-                        "type": "string",
-                        "description": "Group's description.",
-                        "example": "Jogos que já joguei"
-                    },
-                    "games":{
-                        "type": "array",
-                        "items":{
-                            "type": "string",
-                            "description": "Game's name identifier.",
-                            "example": "monopoly"
+                        "description": "User's group",
+                        "properties": {
+                            "name": {
+                                "type": "string",
+                                "description": "Game's name identifier.",
+                                "example": "MyGames"
+                            },
+                            "description": {
+                                "type": "string",
+                                "description": "Group's description.",
+                                "example": "Jogos que já joguei"
+                            },
+                            "games":{
+                                "type": "array",
+                                "items":{
+                                    "type": "object",
+                                    "properties":{
+                                        "id": {
+                                            "type": "string",
+                                            "example": "12312314"
+                                        },
+                                        "name": {
+                                            "type": "string",
+                                            "description": "Game's name.",
+                                            "example": "monopoly"
+                                        }
+                                    } 
+                                }
+                            }
                         }
-                    }
-                }
                     }
                 }
             },

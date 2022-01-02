@@ -1,6 +1,7 @@
 'use strict'
 
 const express = require('express');
+const res = require('express/lib/response');
 
 const openApiUi = require('swagger-ui-express');
 const openApiSpec = require('./docs/borgaDocs.json');
@@ -181,6 +182,7 @@ module.exports = function (services){
         try{
             const groupID = req.params.groupID
             const group = await services.groupDetails(groupID, getBearerToken(req))
+            console.log(group)
             res.json(group)
         }catch(err){
             onError(res, err)
@@ -197,7 +199,7 @@ module.exports = function (services){
         try{
             const params = req.params
             const gameID = params.gameID
-            const deletedGame = await services.deleteGameByName(params.groupID,gameID, getBearerToken(req))
+            const deletedGame = await services.deleteGameByID(params.groupID,gameID, getBearerToken(req))
             res.json(deletedGame)
         }catch(err){
             onError(res, err)
@@ -261,6 +263,7 @@ module.exports = function (services){
 
     // Resource /my/groups/<groupID>/<gameID>
     router.delete("/my/groups/:groupID/:gameID", deleteGameFromGroup)
+
 
     return router
 }

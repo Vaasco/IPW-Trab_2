@@ -23,6 +23,7 @@ module.exports = (games_data, data_mem) => {
     async function requireGroup(groupID, user){
         if(!(await data_mem.hasGroup(groupID, user))) throw errors.INVALID_PARAM(INVALID_GROUP)
     }
+
     /**
      * Creates a new user
      * @param userName 
@@ -66,11 +67,9 @@ module.exports = (games_data, data_mem) => {
      * @returns the requested game.
      */
     async function getGameWithName(gameName){
-        const empty = await data_mem.collectionIsEmpty()
-        if(empty) await saveGameInfo()
         const games = await games_data.findGameByName(gameName)
         games.forEach(async(game) => {
-            const gameExists = await data_mem.hasGameByName(gameName)
+            const gameExists = await data_mem.hasGame(game.id)
             if(!gameExists) await data_mem.addGameToCollection(game)
         })
         return { games }
@@ -188,7 +187,7 @@ module.exports = (games_data, data_mem) => {
      * @param token identifies the user that wants to delete one of his games from a group.
      * @returns true if the delete was succesfull.
      */
-    async function deleteGameByName(groupID, gameID, token){
+    async function deleteGameByID(groupID, gameID, token){
         const user = await getUsername(token)
         await requireGroup(groupID, user)
         const result = await data_mem.deleteGameFromGroup(groupID, gameID, user)
@@ -202,6 +201,17 @@ module.exports = (games_data, data_mem) => {
         await data_mem.saveMechanics(mechanics)
         await data_mem.saveCategories(categories)
     }
+
+    async function onStart(){
+        try{
+            await saveGameInfo()
+            await data_mem.createGuestIndex() /* temporary */
+        }catch(err){
+            console.log(err)
+        }
+    }
+
+    onStart()
     
     return {
         getPopularGames: getPopularGames,
@@ -213,8 +223,9 @@ module.exports = (games_data, data_mem) => {
         groupDetails: groupDetails,
         getGameDetails: getGameDetails,
         deleteGroup: deleteGroup,
-        deleteGameByName: deleteGameByName,
-        createNewUser: createNewUser
+        deleteGameByID: deleteGameByID,
+        createNewUser: createNewUser,
+        saveInfo: saveGameInfo
     }
 
 }

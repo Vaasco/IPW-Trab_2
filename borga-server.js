@@ -1,9 +1,10 @@
 'use strict'
 
-module.exports = function (guest){
+module.exports = function (es_spec, guest){
 
     const data_games = require('./borga-games-data');
-    const data_mem = require('./borga-data-mem')(guest)
+    // const data_mem = require('./borga-data-mem')(guest)
+    const data_mem = require('./borga-db')(es_spec, guest)
     const services = require('./borga-services')(data_games, data_mem)
     const webApi = require('./borga-web-api')(services);
     const webui = require('./borga-web-site')(services, guest.token)
@@ -13,9 +14,9 @@ module.exports = function (guest){
 
     borga.set('view engine', 'hbs');
 
-    borga.use('/favicon.ico', express.static('static-files/favicon.ico'))
+    borga.use('/favicon.ico', express.static('static/favicon.ico'))
 
-    borga.use('/public', express.static('static-files'));
+    borga.use('/public', express.static('static'));
 
     borga.use('/api', webApi);
 
