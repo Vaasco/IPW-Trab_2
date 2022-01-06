@@ -13,22 +13,18 @@ module.exports = function (services, guest_token) {
 		res.render('home');
 	} 
 
-	function getSearchPage(req, res) {
-		res.render('search');
-	} 
-
 	async function findInBorgaGames(req, res){
 		const header = 'Find Game Result'
 		const gameName = req.query.game
 		try{
 			const gameRes = await services.getGameWithName(gameName)
-			res.render('search_games', {header, gameName, games: gameRes.games, allowSave: true})
+			res.render('games_list', {header, gameName, games: gameRes.games, allowSave: true})
 		}catch(err){
 			console.log(err)
 		}
 		
 	}
-
+	
 	async function getGroups(req, res){
 		try{
 			const groupResponse = await services.getMyGroups(getToken())
@@ -98,6 +94,17 @@ module.exports = function (services, guest_token) {
 		}
 	}
 
+	async function getMostPopular(req, res){
+		const header = 'Most Popular Games'
+		try{
+			const popular = await services.getPopularGames()
+			const games = popular.games
+			res.render('games_list', {header, games})
+		}catch(err){
+			console.log(err)
+		}
+	}
+
 	const router = express.Router()
 
 	router.use(require('body-parser').urlencoded({ extended: true }));
@@ -105,8 +112,7 @@ module.exports = function (services, guest_token) {
 	// Homepage
 	router.get('/', getHomepage);
 
-	// Search page
-	router.get('/search', getSearchPage)	
+	// Search page	
 
 	router.get('/game', findInBorgaGames)
 	router.post('/game', saveGame)
@@ -119,6 +125,8 @@ module.exports = function (services, guest_token) {
 	router.post('/group-select', getGroupSelect)
 
 	router.get('/games/:gameID', getGameDetails)
+
+	router.get('/global/popular', getMostPopular)
 
 	return router
 }

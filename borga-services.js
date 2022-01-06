@@ -12,6 +12,7 @@ const MISSING_GROUP_ID = "Missing group id."
 const MISSING_GAME_ID = "Missing game id."
 const GAME_ALREADY_IN_GROUP = "Game already in this group."
 const GAME_NOT_IN_GROUP = "Group has no game with this id."
+const GAME_NOT_IN_COLLECTION = "Game collection has no game with this id"
 const NAME_OR_DESCRIPTION_REQUIRED = "Need at least a new group name or a new description to edit a group."
 const USERNAME_REQUIRED = "Username required."
 
@@ -39,7 +40,7 @@ module.exports = (games_data, data_mem) => {
         else   
            throw errors.INVALID_PARAM(USER_ALREADY_EXISTS)
     }
-
+    
     /**
      * Gets the user name associated to a token.
      * @param token
@@ -58,6 +59,7 @@ module.exports = (games_data, data_mem) => {
      */
     async function getPopularGames(){
         const games = await games_data.findPopularGames()  
+        await addIfNotExists(games)
         return {games}
     } 
 
@@ -68,11 +70,17 @@ module.exports = (games_data, data_mem) => {
      */
     async function getGameWithName(gameName){
         const games = await games_data.findGameByName(gameName)
-        games.forEach(async(game) => {
+        await addIfNotExists(games);
+        return { games }
+    }
+
+    async function addIfNotExists(games){
+        const gamesPromises = games.map(async(game) => {
             const gameExists = await data_mem.hasGame(game.id)
             if(!gameExists) await data_mem.addGameToCollection(game)
         })
-        return { games }
+
+        await Promise.all(gamesPromises)
     }
 
     async function getGameDetails(gameID){
@@ -174,7 +182,9 @@ module.exports = (games_data, data_mem) => {
         await requireGroup(groupID, user)
 
         const gameExists = await data_mem.hasGame(gameID)
-        if(!gameExists) throw errors.INVALID_PARAM()
+        if(!gameExists) throw errors.INVALID_PARAM(GAME_NOT_IN_COLLECTION)
+        const gameInGroup = await data_mem.isGameInGroup(gameID, groupID, user)
+        if(gameInGroup) throw errors.INVALID_PARAM(GAME_ALREADY_IN_GROUP)
         const result = await data_mem.addGameToGroup(groupID, gameID, user)
         if(!result.success) throw errors.INVALID_PARAM(GAME_ALREADY_IN_GROUP)
         return result
@@ -204,6 +214,7 @@ module.exports = (games_data, data_mem) => {
 
     async function onStart(){
         try{
+            await data_mem.reset()
             await saveGameInfo()
             await data_mem.createGuestIndex() /* temporary */
         }catch(err){

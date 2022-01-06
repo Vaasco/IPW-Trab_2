@@ -47,7 +47,6 @@ module.exports = function (es_spec, guest){
      */
     async function createGuestIndex(){
         try{
-            await createNewUser('carregaaaaa')
             await fetch(
                 `${tokensUrl}/_doc/${guest.token}`,
                 putConfigs({userName: guest.user})
@@ -55,7 +54,6 @@ module.exports = function (es_spec, guest){
             await fetch(userUrl(guest.user), {method: 'PUT'})
             
         }catch(err){
-            console.log(err)
             dbError(err)
         }
     }
@@ -81,7 +79,6 @@ module.exports = function (es_spec, guest){
         )
         return {success: success(response.status), token}
        }catch(err){
-           console.log(err)
            dbError(err)
        }
     }
@@ -99,7 +96,6 @@ module.exports = function (es_spec, guest){
             const tokenResponse = await response.json()
             return tokenResponse._source.userName
         }catch(err){
-            console.log(err)
             dbError(err)
         }
     }
@@ -118,7 +114,6 @@ module.exports = function (es_spec, guest){
                 obj.userName === name
             })
         }catch(err){
-            console.log(err)
             dbError(err)
         }
     }
@@ -136,8 +131,8 @@ module.exports = function (es_spec, guest){
                 putConfigs(game)
             )
             return success(response.status)  
+            
        }catch(err){
-            console.log(err)
             dbError(err)
        }
     }
@@ -155,10 +150,9 @@ module.exports = function (es_spec, guest){
             const gameResponse = await response.json()
             return gameResponse._source
         }catch(err){
-            console.log(err)
             dbError(err)
         }
-    }
+    } 
 
     /**
      * Checks if there is a game identified by {gameID} in game's collection.
@@ -172,7 +166,6 @@ module.exports = function (es_spec, guest){
             )
             return success(response.status)
         }catch(err){
-            console.log(err)
             dbError(err)
         }
      }
@@ -183,7 +176,6 @@ module.exports = function (es_spec, guest){
             const groupResponse = await response.json()
             return groupResponse._source
         }catch(err){
-            console.log(err)
             dbError(err)
         }
     } 
@@ -198,7 +190,6 @@ module.exports = function (es_spec, guest){
             return success(response.status)
 
         }catch(err){
-            console.log(err)
             dbError(err)
         }
     }
@@ -224,7 +215,6 @@ module.exports = function (es_spec, guest){
             )     
             return {success: success(response.status), groupObject: {name: createdGroup.name, description: createdGroup.description, id:groupGeneratedId}}            
         }catch(err){
-            console.log(err)
             dbError(err)
         }
     }
@@ -248,7 +238,6 @@ module.exports = function (es_spec, guest){
                 return groupObj
             })
         }catch(err){
-            console.log(err)
             dbError(err)
         }
     }
@@ -274,9 +263,13 @@ module.exports = function (es_spec, guest){
             )
             return {success: success(response.status), groupObject: groupToEdit}
        }catch(err){
-           console.log(err)
             dbError(err)
        }
+    }
+
+    async function isGameInGroup(gameID, groupID, user){
+        const group = await getGroup(groupID, user)
+        return group.games.includes(gameID)
     }
 
     /**
@@ -297,7 +290,6 @@ module.exports = function (es_spec, guest){
             const game = await getGame(gameID)
             return {success: success(response.status), responseObject: {groupName: group.name ,gameName: game.name}}
         }catch(err){
-            console.log(err)
             dbError(err)
         }
     } 
@@ -319,7 +311,6 @@ module.exports = function (es_spec, guest){
             group.games = await Promise.all(gamesPromise)
             return group
         }catch(err){
-            console.log(err)
             dbError(err)
         }
     }
@@ -339,7 +330,6 @@ module.exports = function (es_spec, guest){
             )
             return {success: success(response.status), groupObject: {name: group.name}}
         }catch(err){
-            console.log(err)
             dbError(err)
         }
     }
@@ -364,7 +354,6 @@ module.exports = function (es_spec, guest){
             )
             return {success: success(response.status), responseObject: {groupName: group.name, gameName: gameRemoved.name}}
         }catch(err){
-            console.log(err)
             dbError(err)
         }
     } 
@@ -380,8 +369,8 @@ module.exports = function (es_spec, guest){
             )
 
             await fetch(userUrl(guest.user), {method: 'DELETE'})
+            await fetch(tokensUrl, {method:"DELETE"})
         }catch(err){
-            console.log(err)
             dbError(err)
         }
     }
@@ -394,7 +383,6 @@ module.exports = function (es_spec, guest){
             )
             return success(response.status)
         }catch(err){
-            console.log(err)
             dbError(err)
         }
     }
@@ -408,29 +396,30 @@ module.exports = function (es_spec, guest){
     }
 
     async function getInfoNames(gameID, infoName){
+       try{
         const response = await fetch(
-            `${collectionUrl}/_doc/${infoName}`,
+            `${collectionUrl}/_doc/${infoName}`
         )
         const infoResponse = await response.json()
-
-        const info = infoResponse._source.info
+        const info = infoResponse._source.info   
         const infoNames = await infoIDstoNames(gameID, info, infoName)
         return infoNames
+       }catch(err){
+            dbError(err)
+       }
     }
 
     async function infoIDstoNames(gameId, info, infoName){
-        try{
-            
+        try{ 
             const game = await getGame(gameId)
+            
             const infoIDs = game[infoName].map((obj) => obj.id)
             const gameInfoSet = new Set(infoIDs)
             const gameInfoObjects = info.filter(
                 (infoElem) => gameInfoSet.has(infoElem.id)
             )
             return gameInfoObjects.map((elem) => elem.name) 
-
         }catch(err){
-            console.log(err)
             dbError(err)
         } 
     }
@@ -442,9 +431,7 @@ module.exports = function (es_spec, guest){
     async function getCategories(gameID){
         return await getInfoNames(gameID, 'categories')
     }
-    
-    reset()
-   
+
     return {
         createNewGroup: createNewGroup,
         getGroups: getGroups,
@@ -463,8 +450,9 @@ module.exports = function (es_spec, guest){
         saveMechanics: saveMechanics,
         getMechanics: getMechanics,
         getCategories: getCategories,
-        reset: reset ,
-        createGuestIndex: createGuestIndex 
+        reset: reset,
+        createGuestIndex: createGuestIndex,
+        isGameInGroup: isGameInGroup,
     }
 
 }

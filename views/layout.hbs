@@ -5,12 +5,16 @@
         <title>Borga Games</title>
 	</head>
 	<body>
-		<img src="../static/apple-touch-icon.png", alt="board icon">
+		<img src="/public/apple-touch-icon.png", alt="Site's logo (chess board icon)">
         <h1>BORGA GAMES</h1>
 		<nav>
 			<a href="/">Home</a> |
-			<a href="/search">Search</a> |
+			<a href="/global/popular">Popular</a> |
 			<a href="/groups">My Groups</a> |
+			<form action="/game" method="GET">
+				<input type="text" id="gameName" name="game" placeholder="Search a board game">
+				<input type="submit" value="Search">
+			</form>
 		</nav>
 		<hr>
 		{{{body}}}
