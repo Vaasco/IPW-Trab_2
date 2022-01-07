@@ -30,6 +30,7 @@ module.exports = function (services){
      * @param err the error.
      */    
     function onError(res, err) {
+        console.log('[ERROR]', err);
 		switch (err.name) {
 			case 'NOT_FOUND': 
 				res.status(404);
@@ -49,7 +50,6 @@ module.exports = function (services){
 			default:
 				res.status(500);				
 		}
-        console.log('[ERROR]', err);
 		res.json({ cause: err });
 	}
 
@@ -80,6 +80,7 @@ module.exports = function (services){
             res.json(game)   
         }
         catch(err){
+            console.log(err)
             onError(res,err)
         }
     }

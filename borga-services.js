@@ -2,6 +2,12 @@
 
 const errors = require('./borga-errors.js');
 
+const log = (tag, message) => {
+    console.log(`[${tag}] ${message}`)
+}
+
+const ONSTART_LOG_TAG = "STARTING"
+
 // Error messages
 const USER_LENGHT_ERROR = "User should have at least 4 and at most 16 characters."
 const USER_ALREADY_EXISTS = "Username already exists"
@@ -15,6 +21,7 @@ const GAME_NOT_IN_GROUP = "Group has no game with this id."
 const GAME_NOT_IN_COLLECTION = "Game collection has no game with this id"
 const NAME_OR_DESCRIPTION_REQUIRED = "Need at least a new group name or a new description to edit a group."
 const USERNAME_REQUIRED = "Username required."
+const GAME_NAME_MISSING = "Search name required."
 
 module.exports = (games_data, data_mem) => {
 
@@ -69,6 +76,7 @@ module.exports = (games_data, data_mem) => {
      * @returns the requested game.
      */
     async function getGameWithName(gameName){
+        if(!gameName) throw errors.MISSING_PARAM(GAME_NAME_MISSING)
         const games = await games_data.findGameByName(gameName)
         await addIfNotExists(games);
         return { games }
@@ -214,11 +222,15 @@ module.exports = (games_data, data_mem) => {
 
     async function onStart(){
         try{
+            log(ONSTART_LOG_TAG, "RESETTING THE DATA BASE")
             await data_mem.reset()
+            log(ONSTART_LOG_TAG, "UPDATING GAME INFO (Mechanics and categories)")
             await saveGameInfo()
+            log(ONSTART_LOG_TAG, "CREATING GUEST INDEX ON DATA BASE")
             await data_mem.createGuestIndex() /* temporary */
+            log(ONSTART_LOG_TAG, "Success")
         }catch(err){
-            console.log(err)
+            log(ONSTART_LOG_TAG, err.info.message)
         }
     }
 

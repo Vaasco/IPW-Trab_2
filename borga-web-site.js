@@ -13,6 +13,10 @@ module.exports = function (services, guest_token) {
 		res.render('home');
 	} 
 
+	function onError(res, error){
+		res.render("errors", { error })
+	}
+
 	async function findInBorgaGames(req, res){
 		const header = 'Find Game Result'
 		const gameName = req.query.game
@@ -20,7 +24,7 @@ module.exports = function (services, guest_token) {
 			const gameRes = await services.getGameWithName(gameName)
 			res.render('games_list', {header, gameName, games: gameRes.games, allowSave: true})
 		}catch(err){
-			console.log(err)
+			onError(res, err)
 		}
 		
 	}
@@ -33,7 +37,7 @@ module.exports = function (services, guest_token) {
 			res.render('groups', {groups, noGroups})
 				
 		}catch(err){
-			console.log(err)
+			onError(res, err)
 		}	
 	}
 
@@ -42,7 +46,7 @@ module.exports = function (services, guest_token) {
 			await services.createNewGroup(req.body.groupName, req.body.groupDescription, getToken())
 			res.redirect('/groups')
 		}catch(err){
-			console.log(err)
+			onError(res, err)
 		}
 	}
 
@@ -57,7 +61,7 @@ module.exports = function (services, guest_token) {
 				res.render('group_select', {groups, gameID})
 			}
 		}catch(err){
-			console.log(err)
+			onError(res, err)
 		}
 	}
 
@@ -68,7 +72,7 @@ module.exports = function (services, guest_token) {
 			await services.addGameToGroup(groupID, gameID, getToken())
 			res.redirect("/groups")
 		}catch(err){
-			console.log(err)
+			onError(res, err)
 		}
 	}
 
@@ -79,7 +83,7 @@ module.exports = function (services, guest_token) {
 			const group = detailsResponse.group
 			res.render("group_details", {group})
 		}catch(err){
-			console.log(err)
+			onError(res, err)
 		}
 	}
 
@@ -90,7 +94,7 @@ module.exports = function (services, guest_token) {
 			const game = detailsResponse.game
 			res.render('game_details', {game})
 		}catch(err){
-			console.log(err)
+			onError(res, err)
 		}
 	}
 
@@ -101,7 +105,7 @@ module.exports = function (services, guest_token) {
 			const games = popular.games
 			res.render('games_list', {header, games})
 		}catch(err){
-			console.log(err)
+			onError(res, err)
 		}
 	}
 
