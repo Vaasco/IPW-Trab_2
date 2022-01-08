@@ -1,6 +1,6 @@
 const services_builder = require('../borga-services.js');
-
-const test_data_int = require('../borga-data-mem.js');
+const config = require("../borga-config.js")
+const test_data_int = require('../borga-data-mem.js')(config.guest);
 
 
 const test_user = 'costakilapada'
@@ -11,7 +11,7 @@ const test_description = "Test group."
 const services = services_builder(undefined, test_data_int)
 
 async function createTestGroup(){
-    const returnValue = await services.createNewGroup(test_group, test_description, test_token) 
+    const returnValue = await services.createNewGroup(test_group, test_description, test_token)
     return returnValue
 }
 
@@ -24,34 +24,35 @@ describe('Tests with data_mem', () => {
     test("Create new group", async () => {
         
         const groupRes = await createTestGroup()
-        groupRes.groupObject.id = "123"
-        expect(groupRes.groupObject).toEqual({
-            "name": test_group,
-            "description": test_description,
-            "id": "123"
-        })
+        const group = groupRes.groupObject
+
+
         expect(groupRes.success).toBe(true)
+        expect(group.name).toEqual(test_group)
+        expect(group.description).toEqual(test_description)
+        expect(!isNaN(group.id)).toBe(true)
         
         
         try{
             await services.createNewGroup(undefined, "teste", test_token)
         }catch(err){
+            console.log(err)
             expect(err.name).toEqual("MISSING_PARAM")
         }
 
         try{
             await services.createNewGroup(test_group, "teste", test_token)
         }catch(err){
+            console.log(err)
             expect(err.name).toEqual("INVALID_PARAM")
         }
 
         try{
             await services.createNewGroup(test_group, "teste", undefined)
         }catch(err){
+            console.log(err)
             expect(err.name).toEqual("UNAUTHENTICATED")
         }
-
-        services.addGameToGroup()
 
     });
     
@@ -144,18 +145,18 @@ describe('Tests with data_mem', () => {
     test("Get Details of a group", async () => {
         const createdGroup = await createTestGroup()
         const groupID = createdGroup.groupObject.id
-        const groupDetails = await services.getDetails(groupID, test_token)
+        const groupDetails = await services.groupDetails(groupID, test_token)
         expect(groupDetails).toEqual(groupDetails)
         
         
         try{
-            await services.getDetails("invalidname", test_token)
+            await services.groupDetails("invalidname", test_token)
         }catch(err){
             expect(err.name).toEqual("INVALID_PARAM")
         }
 
         try{
-            await services.getDetails(groupID, undefined)
+            await services.groupDetails(groupID, undefined)
         }catch(err){
             expect(err.name).toEqual("UNAUTHENTICATED")
         }
@@ -187,7 +188,7 @@ describe('Tests with data_mem', () => {
         
         await test_data_int.addGameToGroup(groupID, gameID, test_user)
      
-        const groupRes = await services.deleteGameByName(groupID, gameID, test_token)
+        const groupRes = await services.deleteGameByID(groupID, gameID, test_token)
         expect(groupRes.responseObject).toEqual({
             "groupName": "testGroup",
             "gameName": "Pandemic"
@@ -197,19 +198,19 @@ describe('Tests with data_mem', () => {
         
         
         try{
-            await services.deleteGameByName("invalidgroup", gameID, test_token)
+            await services.deleteGameByID("invalidgroup", gameID, test_token)
         }catch(err){
             expect(err.name).toEqual("INVALID_PARAM")
         }
         
         try{
-            await services.deleteGameByName(groupID, "invalidgame", test_token)
+            await services.deleteGameByID(groupID, "invalidgame", test_token)
         }catch(err){
             expect(err.name).toEqual("INVALID_PARAM")
         }
         
         try{
-            await services.deleteGameByName(groupID, gameID, undefined)
+            await services.deleteGameByID(groupID, gameID, undefined)
         }catch(err){
             expect(err.name).toEqual("UNAUTHENTICATED")
         }

@@ -222,15 +222,11 @@ module.exports = (games_data, data_mem) => {
 
     async function onStart(){
         try{
-            log(ONSTART_LOG_TAG, "RESETTING THE DATA BASE")
             await data_mem.reset()
-            log(ONSTART_LOG_TAG, "UPDATING GAME INFO (Mechanics and categories)")
             await saveGameInfo()
-            log(ONSTART_LOG_TAG, "CREATING GUEST INDEX ON DATA BASE")
             await data_mem.createGuestIndex() /* temporary */
-            log(ONSTART_LOG_TAG, "Success")
         }catch(err){
-            log(ONSTART_LOG_TAG, err.info.message)
+            console.log(err)
         }
     }
 
@@ -248,7 +244,8 @@ module.exports = (games_data, data_mem) => {
         deleteGroup: deleteGroup,
         deleteGameByID: deleteGameByID,
         createNewUser: createNewUser,
-        saveInfo: saveGameInfo
+        saveInfo: saveGameInfo,
+        onStart: onStart
     }
 
 }
