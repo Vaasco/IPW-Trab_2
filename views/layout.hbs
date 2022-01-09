@@ -2,26 +2,51 @@
 <html>
 	<head>
 		<link href="../public/style.css" rel="stylesheet" type="text/css">
+		<link href="https://fonts.googleapis.com/css?family=Anton|Cabin|Lato|Fjalla+One|Montserrat|Roboto&display=swap" rel="stylesheet">
+		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+
 		<meta charset = 'utf-8'>
         <title>Borga Games</title>
 	</head>
 	<body>
 		
 		<nav>
-			<div class="logo-text">
-				<img class="site-logo" src="/public/apple-touch-icon.png", alt="Site's logo (chess board icon)">
-				<h1 class="title">BORGA GAMES</h1>
+			<!--<img class="site-logo" src="/public/apple-touch-icon.png", alt="Site'slogo (chess board icon)">--> 
+			<a href="/" class="logo">BORGA GAMES</a>
+
+			<!-- Nav toggler -->
+			<input type="checkbox" id="box-1">
+			<label for="box-1">
+				<span>MENU <iclass="fas fa-bars"></i></span>
+			</label>
+
+
+			<!-- Nav Items-->
+			<ul class="nav-links">
+				<li><a href="/">Home</a></li>
+				<li><a href="/global/popular">Popular</a></li>
+				<li><a href="/groups">Groups</a></li>
+			</ul>	
+
+			<!-- Nav Search Form-->
+			<div id="navbar-form">
+				<input type="checkbox" id="box-2">
+				<form action="/game" id="search-form">
+					<input type="search" id="search-bar" name="game" placeholder="Search">
+					<button id="search-btn" type="submit">
+						<span><i class="fas fa-search"></i></span>
+					</button>
+				</form>
+
+				<label for="box-2" id="search-form-opener">
+					<span><i class="fas fa-search"></i></span>
+				</label>
+
+				<label for="box-2" id="search-form-closer">
+					<span><i class="fas fa-times"></i></span>
+				</label>
+
 			</div>
-			<ol>
-				<a href="/">Home</a> |
-				<a href="/global/popular">Popular</a> |
-				<a href="/groups">My Groups</a> |
-			</ol>
-			
-			<form action="/game" method="GET">
-				<input type="text" id="gameName" name="game" placeholder="Search a board game">
-				<input type="submit" value="Search">
-			</form>
 		</nav>
 		{{{body}}}
 	</body>
