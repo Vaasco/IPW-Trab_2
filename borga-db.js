@@ -1,5 +1,3 @@
-
-
 'use strict'
 
 /**Dependecies.*/
@@ -47,12 +45,11 @@ module.exports = function (es_spec, guest){
      */
     async function createGuestIndex(){
         try{
-            const response = await fetch(
+            await fetch(
                 `${tokensUrl}/_doc/${guest.token}`,
                 putConfigs({userName: guest.user})
             )
             await fetch(userUrl(guest.user), {method: 'PUT'})
-            
         }catch(err){
             dbError(err)
         }
@@ -68,7 +65,8 @@ module.exports = function (es_spec, guest){
      * @param name to link to the token.
      * @returns true if the new user was created succesfully.
      */
-    async function createNewUser(name){
+    async function createNewUser(userName){
+        const name = userName.toLowerCase()
        try{
         const userExists = await hasUser(name)
         if(userExists) return {success: false}
@@ -77,7 +75,12 @@ module.exports = function (es_spec, guest){
             `${tokensUrl}/_doc/${token}`,
             putConfigs({userName: name})
         )
-        return {success: success(response.status), token}
+        const createGroupIdx = await fetch(userUrl(name), {method: 'PUT'})
+        console.log(createGroupIdx)
+        return {
+            success: success(response.status) && success(createGroupIdx.status), 
+            token
+        }
        }catch(err){
            dbError(err)
        }
@@ -363,13 +366,9 @@ module.exports = function (es_spec, guest){
      */
     async function reset() {
         try{
-            await fetch(
-                collectionUrl
-                ,{method: "DELETE"}
-            )
-
-            await fetch(userUrl(guest.user), {method: 'DELETE'})
-            await fetch(tokensUrl, {method:"DELETE"})
+            await fetch(collectionUrl,{method: "DELETE"}) // Delete Collections Index
+            await fetch(userUrl(guest.user), {method: 'DELETE'}) // Delete user Index
+            await fetch(tokensUrl, {method:"DELETE"}) // Delete Tokens Index
         }catch(err){
             dbError(err)
         }

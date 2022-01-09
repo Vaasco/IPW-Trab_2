@@ -29,6 +29,8 @@ const guestUserUrl = `${es_spec.url}${es_spec.prefix}_tokens/_doc/${config.guest
 const collectionIndex = `${es_spec.url}${es_spec.prefix}_collection`
 const guestUserIndex = `${es_spec.url}${es_spec.prefix}_${config.guest.user}`
 const tokensIndex = `${es_spec.url}${es_spec.prefix}_tokens`
+const userCreated = "supertest"
+const userCreatedIndex = `${es_spec.url}${es_spec.prefix}_${userCreated.toLowerCase()}`
 
 test('Confirm database is running', async () => {
     const response = await fetch(`${es_spec.url}_cat/health`);
@@ -40,14 +42,13 @@ test('Confirm database is running', async () => {
 describe('Integration tests', () => {
 
 	async function allInCollection(games){
-		const responsesSuccess = games.map(async (game) => {
+		const responsesSuccess = games.every(async (game) => {
 			const  gameResponse = await request(app)
 				.get(`/api/games/${game.id}`)
 
 			return gameResponse.status === 200
 		})
-		const responses = await Promise.all(responsesSuccess)
-		return responses.every((success) => {return success})
+		return await responsesSuccess
 	}
 
 	beforeAll(() => {
@@ -59,6 +60,7 @@ describe('Integration tests', () => {
         await fetch(tokensIndex, deleteMethod)
         await fetch(collectionIndex, deleteMethod)
         await fetch(guestUserIndex, deleteMethod)
+		await fetch(userCreatedIndex, deleteMethod)
     });
 
 	const headers = {
@@ -81,16 +83,16 @@ describe('Integration tests', () => {
 		expect(response.status).toBe(200)
 	});
 
-	test('Register user', async() => {
+	test('Register a new user', async() => {
 		const response = await request(app)
 			.post('/api/register')
 			.send({
-				userName: "superTestUser"
+				userName: userCreated
 			})
 			.expect(headers.contentType.name, headers.contentType.value)
 			
 			expect(response.status).toBe(200) 
-			expect(response.body.userName).toEqual('superTestUser')
+			expect(response.body.userName).toEqual(userCreated)
 	})
 
     test('Get empty group list', async() =>{
@@ -179,7 +181,9 @@ describe('Integration tests', () => {
 		const allInDb = await allInCollection(games)
 		expect(allInDb).toBeTruthy()
 		
-	});	
+	});
+	
+	let gameTest; // Initialized when we search for it's name, so the following tests use a game that exists in external services
 
 	test('Search Pandemic Game', async() => {
 		const gameName = 'Pandemic'
@@ -195,15 +199,17 @@ describe('Integration tests', () => {
 		expect(games.every((game) => !!game)).toBeTruthy()
 		const allInDb = await allInCollection(games)
 		expect(allInDb).toBeTruthy()
+
+		gameTest = games[0]
 	})
 
 	/* -------------------------- GAME OPERATIONS -----------------------*/
 
-	let gameID; // Initialized when the game is added to a group, this is the game used in this set of tests
+	let gameID;
 
 	test("Add game to a group", async() => {
 
-		gameID = "6FmFeux5xH"
+		gameID = gameTest.id
 
 		const addGameResponse = await request(app)
 			.post('/api/my/groups/game')
@@ -218,7 +224,7 @@ describe('Integration tests', () => {
 		expect(addGameResponse.status).toBe(200)
 		expect(addGameResponse.body.success).toBeTruthy()	
 		expect(addGameResponse.body.responseObject.groupName).toEqual('editedGroup')
-		expect(addGameResponse.body.responseObject.gameName).toEqual('Pandemic')
+		expect(addGameResponse.body.responseObject.gameName).toEqual(gameTest.name)
 	})
 
 	test("Delete game from group", async() =>{
@@ -232,7 +238,7 @@ describe('Integration tests', () => {
 		expect(deleteGameResponse.status).toBe(200)
 		expect(deleteGameResponse.body.success).toBeTruthy()
 		expect(deleteGameResponse.body.responseObject.groupName).toEqual('editedGroup')
-		expect(deleteGameResponse.body.responseObject.gameName).toEqual('Pandemic')
+		expect(deleteGameResponse.body.responseObject.gameName).toEqual(gameTest.name)
 	});
 
 	// Delete group after game operations so it can be used in them

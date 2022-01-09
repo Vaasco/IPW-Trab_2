@@ -1,22 +1,28 @@
 <!DOCTYPE html>
 <html>
 	<head>
+		<link href="../public/style.css" rel="stylesheet" type="text/css">
 		<meta charset = 'utf-8'>
         <title>Borga Games</title>
 	</head>
 	<body>
-		<img src="/public/apple-touch-icon.png", alt="Site's logo (chess board icon)">
-        <h1>BORGA GAMES</h1>
+		
 		<nav>
-			<a href="/">Home</a> |
-			<a href="/global/popular">Popular</a> |
-			<a href="/groups">My Groups</a> |
+			<div class="logo-text">
+				<img class="site-logo" src="/public/apple-touch-icon.png", alt="Site's logo (chess board icon)">
+				<h1 class="title">BORGA GAMES</h1>
+			</div>
+			<ol>
+				<a href="/">Home</a> |
+				<a href="/global/popular">Popular</a> |
+				<a href="/groups">My Groups</a> |
+			</ol>
+			
 			<form action="/game" method="GET">
 				<input type="text" id="gameName" name="game" placeholder="Search a board game">
 				<input type="submit" value="Search">
 			</form>
 		</nav>
-		<hr>
 		{{{body}}}
 	</body>
 </html>

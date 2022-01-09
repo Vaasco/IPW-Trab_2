@@ -44,7 +44,9 @@ module.exports = (games_data, data_mem) => {
         const result = await data_mem.createNewUser(userName)
         if(result.success) 
             return {userName, token: result.token}
-        else   
+        else if(result.token)  
+            throw errors.FAIL("An Error Occurred.")
+        else
            throw errors.INVALID_PARAM(USER_ALREADY_EXISTS)
     }
     
@@ -225,9 +227,9 @@ module.exports = (games_data, data_mem) => {
 
     async function setup(){
         try{
-            await data_mem.reset()
+            await data_mem.reset() // For debugging and testing purposes
             await saveGameInfo()
-            await data_mem.createGuestIndex() /* temporary */
+            await data_mem.createGuestIndex()
         }catch(err){
         }
     }
