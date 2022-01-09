@@ -183,7 +183,6 @@ module.exports = function (services){
         try{
             const groupID = req.params.groupID
             const group = await services.groupDetails(groupID, getBearerToken(req))
-            console.log(group)
             res.json(group)
         }catch(err){
             onError(res, err)
@@ -251,7 +250,7 @@ module.exports = function (services){
     router.post("/my/groups", addGroup)
 
     // Resource /my/groups
-    router.post("/my/groups/edit", editGroup)
+    router.put("/my/groups/edit", editGroup)
 
     // Resource /my/groups/game
     router.post("/my/groups/game", addGameByID)

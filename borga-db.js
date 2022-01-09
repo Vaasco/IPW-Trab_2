@@ -47,7 +47,7 @@ module.exports = function (es_spec, guest){
      */
     async function createGuestIndex(){
         try{
-            await fetch(
+            const response = await fetch(
                 `${tokensUrl}/_doc/${guest.token}`,
                 putConfigs({userName: guest.user})
             )
@@ -257,9 +257,9 @@ module.exports = function (es_spec, guest){
             const newName = givenName || groupToEdit.groupName
             groupToEdit.name = newName
             groupToEdit.description = newDesc
-            const response = fetch(
+            const response = await fetch(
                 `${userUrl(userName)}/_doc/${groupID}`,
-                 putDetails(groupToEdit)
+                 putConfigs(groupToEdit)
             )
             return {success: success(response.status), groupObject: groupToEdit}
        }catch(err){

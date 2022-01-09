@@ -2,10 +2,12 @@
 
 module.exports = function (es_spec, guest){
 
-    const data_games = require('./borga-games-data');
-    // const data_mem = require('./borga-data-mem')(guest)
+    const games_data = require('./borga-games-data.js');
+    //const data_mem = require('./borga-data-mem')(guest)
     const data_mem = require('./borga-db')(es_spec, guest)
-    const services = require('./borga-services')(data_games, data_mem)
+    
+    const services = require('./borga-services')(games_data, data_mem)
+
     const webApi = require('./borga-web-api')(services);
     const webui = require('./borga-web-site')(services, guest.token)
 
@@ -22,6 +24,6 @@ module.exports = function (es_spec, guest){
 
     borga.use('/', webui);
 
-    return borga
+    return {app: borga, setup: services.setup}
 }
 

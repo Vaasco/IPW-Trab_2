@@ -93,6 +93,8 @@ module.exports = (games_data, data_mem) => {
 
     async function getGameDetails(gameID){
         if(!gameID) throw errors.MISSING_PARAM(MISSING_GAME_ID) 
+        const gameExists = await data_mem.hasGame(gameID)
+        if(!gameExists) throw errors.NOT_FOUND(GAME_NOT_IN_COLLECTION)
         const game = await data_mem.getGame(gameID)
         const mechanics = data_mem.getMechanics(gameID)
         const categories = data_mem.getCategories(gameID)
@@ -195,6 +197,7 @@ module.exports = (games_data, data_mem) => {
         if(gameInGroup) throw errors.INVALID_PARAM(GAME_ALREADY_IN_GROUP)
         const result = await data_mem.addGameToGroup(groupID, gameID, user)
         if(!result.success) throw errors.INVALID_PARAM(GAME_ALREADY_IN_GROUP)
+
         return result
     }
 
@@ -220,17 +223,14 @@ module.exports = (games_data, data_mem) => {
         await data_mem.saveCategories(categories)
     }
 
-    async function onStart(){
+    async function setup(){
         try{
             await data_mem.reset()
             await saveGameInfo()
             await data_mem.createGuestIndex() /* temporary */
         }catch(err){
-            console.log(err)
         }
     }
-
-    onStart()
     
     return {
         getPopularGames: getPopularGames,
@@ -245,7 +245,7 @@ module.exports = (games_data, data_mem) => {
         deleteGameByID: deleteGameByID,
         createNewUser: createNewUser,
         saveInfo: saveGameInfo,
-        onStart: onStart
+        setup: setup
     }
 
 }

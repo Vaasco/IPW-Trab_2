@@ -2,13 +2,13 @@ const services_builder = require('../borga-services.js');
 const config = require("../borga-config.js")
 const test_data_int = require('../borga-data-mem.js')(config.guest);
 
+const services = services_builder(undefined, test_data_int);
+
 
 const test_user = 'costakilapada'
-const test_token = 'abd331d7-fd48-4054-9b73-7b7edf2941a6';
+const test_token = 'abd331d7-fd48-4054-9b73-7b7edf2941a6'
 const test_group = 'testGroup'
 const test_description = "Test group."
-
-const services = services_builder(undefined, test_data_int)
 
 async function createTestGroup(){
     const returnValue = await services.createNewGroup(test_group, test_description, test_token)
@@ -36,21 +36,18 @@ describe('Tests with data_mem', () => {
         try{
             await services.createNewGroup(undefined, "teste", test_token)
         }catch(err){
-            console.log(err)
             expect(err.name).toEqual("MISSING_PARAM")
         }
 
         try{
             await services.createNewGroup(test_group, "teste", test_token)
         }catch(err){
-            console.log(err)
             expect(err.name).toEqual("INVALID_PARAM")
         }
 
         try{
             await services.createNewGroup(test_group, "teste", undefined)
         }catch(err){
-            console.log(err)
             expect(err.name).toEqual("UNAUTHENTICATED")
         }
 

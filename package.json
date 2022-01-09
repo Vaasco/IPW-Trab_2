@@ -19,7 +19,7 @@
     "hbs": "^4.2.0",
     "node-fetch": "^2.6.6",
     "supertest": "^6.1.6",
-   "swagger-express": "^1.0.5",
+    "swagger-express": "^1.0.5",
     "swagger-jsdoc": "^6.1.0",
     "swagger-ui-express": "^4.2.0"
   },
