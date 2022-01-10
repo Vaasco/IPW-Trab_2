@@ -1,10 +1,6 @@
 
-const GREEN = "\x1b[32m"
-const RESET = "\x1b[0m"
-const BRIGHT = "\x1b[1m"
-const log = () => {
-
-}
+const log = require('./logs')
+const SERVER_LOG_TAG = "SERVER"
 
 const default_port = "8888";
 const port = process.argv[2] || default_port;
@@ -23,9 +19,9 @@ const app = serverResponse.app
 serverResponse.setup().then(() => {
     app.listen(port, (err) => {
         if(err){
-            console.log("\x1b[31m[SERVER] Error on server startup\x1b[0m")
+            log.fail(SERVER_LOG_TAG, `Error on server startup ${err}`)
         }
-        console.log(`${GREEN}${BRIGHT}[SERVER] Server listening on ${port}\x1b[0m`) 
+        log.success(SERVER_LOG_TAG, `Server listening on ${port}`) 
     })
 }).catch((err) => {
     console.log(err)

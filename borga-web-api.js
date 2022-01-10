@@ -1,7 +1,7 @@
 'use strict'
 
 const express = require('express');
-const res = require('express/lib/response');
+const logs = require("./logs")
 
 const openApiUi = require('swagger-ui-express');
 const openApiSpec = require('./docs/borgaDocs.json');
@@ -30,7 +30,7 @@ module.exports = function (services){
      * @param err the error.
      */    
     function onError(res, err) {
-        console.log('[ERROR]', err);
+        logs.fail('[ERROR', err);
 		switch (err.name) {
 			case 'NOT_FOUND': 
 				res.status(404);

@@ -76,7 +76,6 @@ module.exports = function (es_spec, guest){
             putConfigs({userName: name})
         )
         const createGroupIdx = await fetch(userUrl(name), {method: 'PUT'})
-        console.log(createGroupIdx)
         return {
             success: success(response.status) && success(createGroupIdx.status), 
             token

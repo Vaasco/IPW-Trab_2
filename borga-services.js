@@ -1,10 +1,7 @@
 'use strict'
 
 const errors = require('./borga-errors.js');
-
-const log = (tag, message) => {
-    console.log(`[${tag}] ${message}`)
-}
+const logs = require("./logs") 
 
 const ONSTART_LOG_TAG = "STARTING"
 
@@ -227,10 +224,14 @@ module.exports = (games_data, data_mem) => {
 
     async function setup(){
         try{
+            logs.debug(ONSTART_LOG_TAG, "RESETTING THE DATA BASE")
             await data_mem.reset() // For debugging and testing purposes
+            logs.debug(ONSTART_LOG_TAG, "SAVING GAME MECHANICS AND CATEGORIES")
             await saveGameInfo()
+            logs.debug(ONSTART_LOG_TAG, "CREATING GUEST INDEX")
             await data_mem.createGuestIndex()
         }catch(err){
+            logs.fail("ERROR", JSON.stringify(err, null, 4))
         }
     }
     
