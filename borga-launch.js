@@ -25,7 +25,7 @@ serverResponse.setup().then(() => {
         if(err){
             console.log("\x1b[31m[SERVER] Error on server startup\x1b[0m")
         }
-        console.log(`${GREEN}${BRIGHT}[SERVER] Server listening on port ${port}\x1b[0m`)
+        console.log(`${GREEN}${BRIGHT}[SERVER] Server listening on ${port}\x1b[0m`) 
     })
 }).catch((err) => {
     console.log(err)

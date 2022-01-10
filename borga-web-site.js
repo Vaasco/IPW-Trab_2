@@ -44,7 +44,7 @@ module.exports = function (services, guest_token) {
 	async function createGroup(req, res){
 		try{
 			await services.createNewGroup(req.body.groupName, req.body.groupDescription, getToken())
-			res.redirect('/groups')
+			res.redirect("/groups")
 		}catch(err){
 			onError(res, err)
 		}
@@ -130,7 +130,7 @@ module.exports = function (services, guest_token) {
 
 	router.get('/games/:gameID', getGameDetails)
 
-	router.get('/global/popular', getMostPopular)
+	router.get('/popular', getMostPopular)
 
 	return router
 }

@@ -10,11 +10,7 @@
         <table>
             <tr>
                 <td>Name:</td>
-                <td>{{name}}</td>
-            </tr>
-            <tr>
-                <td>Url:</td>
-                <td><a href={{url}} target="_blank">Board Game Atlas' page</a></td>
+                <td><a href={{url}} target="_blank"<td>{{name}}</td></a>
             </tr>
             <tr>
                 <td>Rank:</td>
@@ -28,13 +24,17 @@
              <tr>
                  <td>
                     <form>
-                        <input type='submit' formaction="/games/{{id}}" value='Details'>
+                        <button id="remove-button" type="submit" formaction="/games/{{id}}">
+                            <i class="bi bi-info-circle bi-hover"></i>
+                        </button>
                     </form> 
                 </td>
                 <td> 
                     <form action='/group-select' method='POST'>
                         <input type='hidden' name='gameID' value='{{id}}'>
-                        <input type='submit' value='Save'>
+                        <button id="remove-button" type="submit">
+                            <i class="bi bi-plus-circle bi-hover"></i>
+                        </button>
                     </form>
                 </td>
             </tr> 
