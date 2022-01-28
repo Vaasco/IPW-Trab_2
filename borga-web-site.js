@@ -13,6 +13,28 @@ module.exports = function (services, guest_token) {
 		res.render('home');
 	} 
 
+	function getLoginPage(req, res) {
+		res.render('login');
+	} 
+
+	async function doLogin(req, res) {
+		const username = req.body.username;
+		const password = req.body.password; 
+		try {
+			const user = await services.getUserName(username, password);
+			req.login({ username: user.username, token: user.token }, err => {
+				if (err) {
+					console.log('LOGIN ERROR', err);
+				}
+				res.redirect('/');
+			});
+		} catch (err) {
+			// TO DO : improve error handling
+			console.log('LOGIN EXCEPTION', err);
+			res.redirect('/');
+		}
+	} 
+
 	function onError(res, error){
 		res.render("errors", { error })
 	}
@@ -105,6 +127,7 @@ module.exports = function (services, guest_token) {
 			const games = popular.games
 			res.render('games_list', {header, games})
 		}catch(err){
+			console.log(err)
 			onError(res, err)
 		}
 	}
@@ -116,21 +139,31 @@ module.exports = function (services, guest_token) {
 	// Homepage
 	router.get('/', getHomepage);
 
-	// Search page	
 
+	// Login page
+	//router.get('/authenticate', getLoginPage);
+
+	// Login action
+	//router.post('/login', doLogin);
+	
+	// Logout action
+	//router.post('/logout', doLogout);
+
+	// Search page	
 	router.get('/game', findInBorgaGames)
-	router.post('/game', saveGame)
+	
 
 	router.get('/groups', getGroups)
 	router.post('/groups', createGroup)
 
-	router.get('/groups/:groupID', getMyGroupDetails)
+	router.get('groups/:groupID', getMyGroupDetails)
+	router.post('/game', saveGame)
 
 	router.post('/group-select', getGroupSelect)
 
 	router.get('/games/:gameID', getGameDetails)
 
-	router.get('/popular', getMostPopular)
+	router.get('/games/popular', getMostPopular)
 
 	return router
 }

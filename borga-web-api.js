@@ -239,9 +239,9 @@ module.exports = function (services){
     router.use(express.json());
 
          
-    router.get("/global/popular", getMostPopularGames)
-    router.get("/global/game/:gameName", getGameByName)
-    
+    router.get("/games/popular", getMostPopularGames)
+    router.get("/games/:gameName", getGameByName)
+    router.get("/games/:gameID", getGameDetails)
 
     router.post("/register", createNewUser)
     
@@ -258,8 +258,6 @@ module.exports = function (services){
     // Resource /my/groups/<groupName>
     router.get("/my/groups/:groupID", getGroupDetails)
     router.delete("/my/groups/:groupID", deleteGroupById)
-
-    router.get("/games/:gameID", getGameDetails)
 
     // Resource /my/groups/<groupID>/<gameID>
     router.delete("/my/groups/:groupID/:gameID", deleteGameFromGroup)

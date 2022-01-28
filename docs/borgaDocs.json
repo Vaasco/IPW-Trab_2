@@ -23,7 +23,7 @@
         }  
     ],
     "paths": {
-        "/global/popular": {
+        "/games/popular": {
             "get": {
                 "tags": [
                     "Global"
@@ -53,7 +53,7 @@
                }
             }
          },
-         "/global/game/{gameName}": {
+         "/games/{gameName}": {
             "get": {
                 "tags": [
                     "Global"
