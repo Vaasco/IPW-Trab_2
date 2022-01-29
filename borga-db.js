@@ -112,14 +112,19 @@ module.exports = function (es_spec, guest){
      * Cheks if already exists a user with {name} in users collection
      */
     async function hasUser(name){
-        const response = await fetch(
-            `${tokensUrl}/_search`
-        )
-        const tokensResponse = await response.json()
-        const usersObjs = tokensResponse.hits.hits
-        return usersObjs.some((obj) => {
-            return obj._source.userName === name
-        })
+        try{
+            const response = await fetch(
+                `${tokensUrl}/_search`
+            )
+            const tokensResponse = await response.json()
+            const usersObjs = tokensResponse.hits.hits
+            return usersObjs.some((obj) => {
+                return obj._source.userName === name
+            })
+        }catch(err){
+            dbError(err)
+        }
+        
     }
 
     /**
@@ -128,16 +133,20 @@ module.exports = function (es_spec, guest){
      * @returns 
      */
     async function getUser(userName){
-        const response = await fetch(
-            `${tokensUrl}/_search`
-        )
-        const tokensResponse = await response.json()
-        
-        const usersHits = tokensResponse.hits.hits
-        const userObj = usersHits
-            .find((obj) => obj._source.userName === userName )
-        userObj._source.token = userObj._id
-        return userObj._source
+        try{
+            const response = await fetch(
+                `${tokensUrl}/_search`
+            )
+            const tokensResponse = await response.json()
+            
+            const usersHits = tokensResponse.hits.hits
+            const userObj = usersHits
+                .find((obj) => obj._source.userName === userName )
+            userObj._source.token = userObj._id
+            return userObj._source
+        }catch(err){
+            dbError(err)
+        }
     }
 
     /**
