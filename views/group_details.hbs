@@ -11,21 +11,28 @@
         <tr>
             <td>Games:</td>
             <td>
-                {{#with group.games}}
-                    {{#each this}}
-                        {{this.name}}
-                        <form>
-                            <input type='submit' formaction="/games/{{this.id}}" value='Details'>
-                        </form>
-                        {{#unless @last}}|{{/unless}} 
-                    {{else}}
-                        No games
-                    {{/each}}
-                {{/with}}
+                <ul>
+                    {{#with group.games}}
+                        {{#each this}}
+                            <li class="game-item", id="game-{{this.id}}">
+                                <span>{{this.name}}</span>
+                                <form>
+                                    <input type='submit' formaction="/games/{{this.id}}" value='Details'>
+                                </form>
+                                <button class="delete-games" id="btn-game-{{this.id}}">Delete</button>
+                            </li>
+                        {{else}}
+                            No games
+                        {{/each}}
+                    {{/with}}
+                </ul>
             </td>
         </tr>
     </table>
 {{/if}}
 
 
-
+<script src="/public/client.js"></script>
+<script>
+     setupGameDelete("{{group.id}}")
+</script>

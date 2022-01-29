@@ -6,11 +6,13 @@
     <h1>My Groups</h1>
     <ul>
         {{#each groups}}
-            <li>
+            <li class="game-item" id="item-{{id}}">
                 {{name}}
                 <form>
                     <input type="submit" formaction="/groups/{{id}}" value="Details">
-                </form>
+                    <button class="delete-groups" id="btn-group-{{id}}">Delete</button>
+                    <button class="edit-groups" formaction="/groups/edition/{{id}}" >Edit</button>
+                </form> 
             </li>
         {{/each}}
     </ul>    
@@ -26,3 +28,8 @@
         <input type='text' id='groupDescription' name='groupDescription'><br><br>
         <input type='submit' value='Add'>
 </form>
+
+<script src="/public/client.js"></script>
+<script>
+     setupGroupDelete()
+</script>

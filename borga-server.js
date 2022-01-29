@@ -1,8 +1,11 @@
 'use strict'
 
+const passport = require("passport")
+const session = require("express-session")
+
 module.exports = function (es_spec, guest){
 
-    const games_data = require('./borga-games-data.js');
+    const games_data = require('./borga-games-data');
     //const data_mem = require('./borga-data-mem')(guest)
     const data_mem = require('./borga-db')(es_spec, guest)
     
@@ -13,6 +16,15 @@ module.exports = function (es_spec, guest){
 
     const express = require('express');
     const borga = express();
+
+    borga.use(session({
+		secret: 'borga-games',
+		resave: false,
+		saveUninitialized: false
+	}));
+    
+    borga.use(passport.initialize());
+	borga.use(passport.session());
 
     borga.set('view engine', 'hbs');
 

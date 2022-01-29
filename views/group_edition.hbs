@@ -1,0 +1,13 @@
+<form action="/groups" method="GET">
+    <h2>Edit a group: </h2>
+    <label for="group-name">New Name: </label><br>
+    <input type='text' id='group-name'  required><br><br>
+    <label for="group-description">New Description: </label><br>
+    <input type='text' id='group-description'><br><br>
+    <input type='submit' id="edit-{{groupID}}" value='Add'>
+</form>
+
+<script src="/public/client.js"></script>
+<script>
+    setupGroupEdit({{groupID}})
+</script>

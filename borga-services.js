@@ -3,7 +3,7 @@
 const errors = require('./borga-errors.js');
 const logs = require("./logs") 
 
-const ONSTART_LOG_TAG = "STARTING"
+const ONSTART_LOG_TAG = "SETUP"
 
 // Error messages
 const USER_LENGHT_ERROR = "User should have at least 4 and at most 16 characters."
@@ -23,7 +23,7 @@ const GAME_NAME_MISSING = "Search name required."
 module.exports = (games_data, data_mem) => {
 
     /**
-     * Function used in functions that require the group existance
+     * Throws an error if a group with thos id doesn't exist in the database
      */
     async function requireGroup(groupID, user){
         if(!(await data_mem.hasGroup(groupID, user))) throw errors.INVALID_PARAM(INVALID_GROUP)
@@ -74,7 +74,7 @@ module.exports = (games_data, data_mem) => {
      * @param gameName name of the game to get.
      * @returns the requested game.
      */
-    async function getGameWithName(gameName){
+    async function searchGameByName(gameName){
         if(!gameName) throw errors.MISSING_PARAM(GAME_NAME_MISSING)
         const games = await games_data.findGameByName(gameName)
         await addIfNotExists(games);
@@ -187,6 +187,7 @@ module.exports = (games_data, data_mem) => {
      async function addGameToGroup(groupID, gameID, token){   
         if(!groupID) throw errors.MISSING_PARAM(MISSING_GROUP_ID) 
         if(!gameID) throw errors.MISSING_PARAM(MISSING_GAME_ID)
+
         const user = await getUsername(token)
         await requireGroup(groupID, user)
 
@@ -224,8 +225,8 @@ module.exports = (games_data, data_mem) => {
 
     async function setup(){
         try{
-            logs.debug(ONSTART_LOG_TAG, "RESETTING THE DATA BASE")
-            await data_mem.reset() // For debugging and testing purposes
+            //logs.debug(ONSTART_LOG_TAG, "RESETTING THE DATA BASE")
+            //await data_mem.reset() // For debugging and testing purposes
             logs.debug(ONSTART_LOG_TAG, "SAVING GAME MECHANICS AND CATEGORIES")
             await saveGameInfo()
             logs.debug(ONSTART_LOG_TAG, "CREATING GUEST INDEX")
@@ -237,7 +238,7 @@ module.exports = (games_data, data_mem) => {
     
     return {
         getPopularGames: getPopularGames,
-        getGameWithName: getGameWithName,
+        searchGameByName: searchGameByName,
         addGameToGroup: addGameToGroup,
         createNewGroup: createNewGroup,
         getMyGroups: getMyGroups,

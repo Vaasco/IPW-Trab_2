@@ -26,7 +26,9 @@ const putConfigs = (obj) => {
 }
 
 const guestUserUrl = `${es_spec.url}${es_spec.prefix}_tokens/_doc/${config.guest.token}`
-const collectionIndex = `${es_spec.url}${es_spec.prefix}_collection`
+const collectionIndex = `${es_spec.url}${es_spec.prefix}_gamecollection`
+const categoriesIndex = `${es_spec.url}${es_spec.prefix}_categories`
+const mechanicsIndex = `${es_spec.url}${es_spec.prefix}_mechanics`
 const guestUserIndex = `${es_spec.url}${es_spec.prefix}_${config.guest.user}`
 const tokensIndex = `${es_spec.url}${es_spec.prefix}_tokens`
 const userCreated = "supertest"
@@ -61,6 +63,8 @@ describe('Integration tests', () => {
         await fetch(collectionIndex, deleteMethod)
         await fetch(guestUserIndex, deleteMethod)
 		await fetch(userCreatedIndex, deleteMethod)
+		await fetch(categoriesIndex, deleteMethod)
+		await fetch(mechanicsIndex, deleteMethod)
     });
 
 	const headers = {
@@ -145,13 +149,12 @@ describe('Integration tests', () => {
 
 	test("Edit a group", async () => {
 		const editResponse = await request(app)
-			.put('/api/my/groups/edit')
+			.put(`/api/my/groups/${groupID}`)
 			.set(headers.authorization.name, headers.authorization.value)
 			.set(headers.accept.name, headers.accept.value)
 			.send({
-				id: groupID,
 				newGroupName: "editedGroup",
-				newDescription: "editedGroup description"
+				newGroupDescription: "editedGroup description"
 			})
 			.expect(headers.contentType.name, headers.contentType.value)
 
@@ -166,7 +169,7 @@ describe('Integration tests', () => {
 	test("Browse popular games", async () => {
 
 		const popularGamesResponse = await request(app)
-			.get('/api/global/popular')
+			.get('/api/games/popular')
 			.set(headers.accept.name, headers.accept.value)
 			.expect(headers.contentType.name, headers.contentType.value)
 
@@ -189,7 +192,7 @@ describe('Integration tests', () => {
 		const gameName = 'Pandemic'
 		
 		const searchResponse = await request(app)
-			.get(`/api/global/game/${gameName}`)
+			.get(`/api/games?gameName=${gameName}`)
 			.set(headers.accept.name, headers.accept.value)
 			.expect(headers.contentType.name, headers.contentType.value)
 
@@ -212,7 +215,7 @@ describe('Integration tests', () => {
 		gameID = gameTest.id
 
 		const addGameResponse = await request(app)
-			.post('/api/my/groups/game')
+			.post(`/api/my/groups/${groupID}/${gameID}`)
 			.set(headers.authorization.name, headers.authorization.value)
 			.set(headers.accept.name, headers.accept.value)
 			.send({	

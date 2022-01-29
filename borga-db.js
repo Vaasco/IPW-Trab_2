@@ -4,6 +4,7 @@
 const crypto = require('crypto')
 const errors = require('./borga-errors.js');
 const fetch = require('node-fetch');
+const logs = require('./logs.js');
 
 const putConfigs = (obj) => {
     return {
@@ -28,14 +29,18 @@ module.exports = function (es_spec, guest){
 
     const userUrl = (userName) => `${baseUrl}${es_spec.prefix}_${userName}`;
 
-    const collectionUrl = `${baseUrl}${es_spec.prefix}_collection`
+    const gameCollectionURL = `${baseUrl}${es_spec.prefix}_gamecollection`
 
     function gameUrl(gameID){
-        return `${collectionUrl}/_doc/${gameID}`
+        return `${gameCollectionURL}/_doc/${gameID}`
     }
 
     const tokensUrl = `${baseUrl}${es_spec.prefix}_tokens`
 
+    const infoUrl = (infoName, infoObjId) => `${baseUrl}${es_spec.prefix}_${infoName}/_doc/${infoObjId}`
+    
+
+    
     function dbError(err){
         throw errors.FAIL(err)
     }
@@ -66,7 +71,7 @@ module.exports = function (es_spec, guest){
      * @returns true if the new user was created succesfully.
      */
     async function createNewUser(userName){
-        const name = userName.toLowerCase()
+       const name = userName.toLowerCase()
        try{
         const userExists = await hasUser(name)
         if(userExists) return {success: false}
@@ -106,18 +111,16 @@ module.exports = function (es_spec, guest){
      * Cheks if already exists a user with {name} in users collection
      */
     async function hasUser(name){
-        try{
-            const response = await fetch(
-                `${tokensUrl}/_search`
-            )
-            const tokensResponse = await response.json()
-            const tokens = tokensResponse.hits.hits
-            return tokens.some((obj) => {
-                obj.userName === name
-            })
-        }catch(err){
-            dbError(err)
-        }
+        const response = await fetch(
+            `${tokensUrl}/_search`
+        )
+        const tokensResponse = await response.json()
+        const usersObjs = tokensResponse.hits.hits
+        return usersObjs.some((obj) => {
+            logs.debug("HAS_USER", obj._source.userName)
+            logs.debug("HAS_USER", name)
+            return obj._source.userName === name
+        })
     }
 
     /**
@@ -181,6 +184,7 @@ module.exports = function (es_spec, guest){
             dbError(err)
         }
     } 
+    
     /**
      * 
      */
@@ -212,7 +216,7 @@ module.exports = function (es_spec, guest){
                 games: []
             }
             const response = await fetch(
-                `${userUrl(userName)}/_doc/${groupGeneratedId}`,
+                `${userUrl(userName)}/_doc/${groupGeneratedId}?refresh=wait_for`,
                 putConfigs(createdGroup)    
             )     
             return {success: success(response.status), groupObject: {name: createdGroup.name, description: createdGroup.description, id:groupGeneratedId}}            
@@ -365,53 +369,79 @@ module.exports = function (es_spec, guest){
      */
     async function reset() {
         try{
-            await fetch(collectionUrl,{method: "DELETE"}) // Delete Collections Index
+            
+            await fetch(gameCollectionURL,{method: "DELETE"}) // Delete Collections Index
             await fetch(userUrl(guest.user), {method: 'DELETE'}) // Delete user Index
-            await fetch(tokensUrl, {method:"DELETE"}) // Delete Tokens Index
+            await fetch(tokensUrl, {method:"DELETE"}) // Delete Tokens Index*/
+            await fetch(userUrl("userteste"), {method: 'DELETE'}) // Delete user Index
         }catch(err){
             dbError(err)
         }
     }
 
+    /**
+     * 
+     */
     async function saveInfo(info, infoName){
         try{
-            const response = await fetch(
-                `${collectionUrl}/_doc/${infoName}?refresh=wait_for`,
-                 putConfigs({info})
-            )
-            return success(response.status)
+            const requestPromises = info.map(async (infoObj) =>{
+                fetch(
+                    infoUrl(infoName, infoObj.id)+"?refresh=wait_for",
+                     putConfigs({infoObj})
+                ) 
+            })
+            await Promise.all(requestPromises)
         }catch(err){
             dbError(err)
         }
     }
-
+    
+    /**
+     * Saves the mechanics info in the database
+     */
     async function saveMechanics(mechanics){
-        return (await saveInfo(mechanics, "mechanics"))
+        await saveInfo(mechanics, "mechanics")
     }
-
+    
+    /**
+     * Saves the categories info in the database
+     */
     async function saveCategories(categories){
-        return (await saveInfo(categories, "categories"))
+        await saveInfo(categories, "categories")
     }
 
+    /**
+     * Gets the names of [infoName] from [gameID]
+     *
+     * @param infoName used to chose between categories and mechanics
+     */
     async function getInfoNames(gameID, infoName){
        try{
-        const response = await fetch(
-            `${collectionUrl}/_doc/${infoName}`
-        )
-        const infoResponse = await response.json()
-        const info = infoResponse._source.info   
-        const infoNames = await infoIDstoNames(gameID, info, infoName)
-        return infoNames
+            const game = await getGame(gameID)
+            const gameInfo = game[infoName]
+            const infoObjects = gameInfo.map(async (infoObj) => {
+                const response = await fetch(infoUrl(infoName, infoObj.id))
+                const infoResponse = await response.json()
+                const rv = infoResponse._source.infoObj
+                return rv    
+            })
+            const objects = await Promise.all(infoObjects) 
+            return await infoIDstoNames(gameInfo, objects)
        }catch(err){
             dbError(err)
        }
     }
 
-    async function infoIDstoNames(gameId, info, infoName){
+
+    /**
+     * Intersects the info ids from a game (gameInfo) with all of the info's ids.
+     * 
+     * @param gameInfo array of info ids from a game
+     * @param info array of objects that contain each info name and id
+     */
+    async function infoIDstoNames(gameInfo, info){
         try{ 
-            const game = await getGame(gameId)
-            
-            const infoIDs = game[infoName].map((obj) => obj.id)
+            const infoIDs = gameInfo.map((obj) => obj.id)
             const gameInfoSet = new Set(infoIDs)
             const gameInfoObjects = info.filter(
                 (infoElem) => gameInfoSet.has(infoElem.id)
@@ -422,10 +452,16 @@ module.exports = function (es_spec, guest){
         } 
     }
 
+    /**
+     * @returns an array with the name of the mechanics from [gameID]
+     */
     async function getMechanics(gameID){
         return await getInfoNames(gameID, "mechanics")
     }
 
+    /**
+     * @returns an array with the name of the categories from [gameID]
+     */
     async function getCategories(gameID){
         return await getInfoNames(gameID, 'categories')
     }

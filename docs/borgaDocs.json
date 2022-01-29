@@ -53,16 +53,16 @@
                }
             }
          },
-         "/games/{gameName}": {
+         "/games": {
             "get": {
                 "tags": [
                     "Global"
                 ],
-                "summary": "Gets the game by name.",
+                "summary": "Gets 10 games based on this search.",
                 "parameters": [
                     {
                         "name": "gameName",
-                        "in": "path",
+                        "in": "query",
                         "required": true,
                         "description": "Game's name to search for.",
                         "schema": {
@@ -112,7 +112,7 @@
                 ],
                 "summary": "Creates a new user",
                 "requestBody": {
-                    "description": "Name of the user to register",
+                    "description": "username and password to register",
                     "required": true,
                     "content": {
                         "application/json": {
@@ -230,108 +230,6 @@
                 }
             }
         },
-        "/my/groups/edit":{
-            "post":{
-                "tags": [
-                    "User"
-                ],
-                "summary": "Edits a group from an user's collection.",
-                "requestBody":{
-                    "description": "Group name to edit and the respective new group name and new description",
-                    "required": true,
-                    "content":{
-                        "application/json":{
-                            "schema": {
-                                "$ref": "#/components/schemas/GroupEditBody"
-                            }
-                        }
-                    }
-                },
-                "responses":{
-                    "200": {
-                        "description": "The group got succesfully edited",
-                        "content":{
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/GroupEditResponse"
-                                }
-                            }
-                        }
-                    },
-                    "400": {
-                        "description": "Invalid or missing group name to edit or missing new group name and new description.",
-                        "content": {
-                          "application/json": {
-                            "schema": {
-                              "$ref": "#/components/schemas/AppError"
-                            }
-                          }
-                        }
-                    },
-                    "401": {
-                        "description": "Missing or Invalid API token. The user is not authenticated.",
-                        "content": {
-                          "application/json": {
-                            "schema": {
-                              "$ref": "#/components/schemas/AppError"
-                            }
-                          }
-                        }
-                    }     
-                }
-            }
-        },
-        "/my/groups/game":{
-            "post":{
-                "tags": [
-                    "User"
-                ],
-                "summary": "Adds a game to a group.",
-                "requestBody":{
-                    "description": "Group and game ids.",
-                    "required": true,
-                    "content":{
-                        "application/json":{
-                            "schema": {
-                                "$ref": "#/components/schemas/GameAddition"
-                            }
-                        }
-                    }
-                },
-                "responses":{
-                    "200": {
-                        "description": "The game is now in the group",
-                        "content": {
-                          "application/json": {
-                            "schema": {
-                              "$ref": "#/components/schemas/GameOperationResponse"
-                            }
-                          }
-                        }
-                      },
-                    "400": {
-                        "description": "Group or game name's missing.",
-                        "content": {
-                          "application/json": {
-                            "schema": {
-                              "$ref": "#/components/schemas/AppError"
-                            }
-                          }
-                        }
-                      },
-                    "401": {
-                        "description": "Missing or Invalid API token. The user is not authenticated.",
-                        "content": {
-                          "application/json": {
-                            "schema": {
-                              "$ref": "#/components/schemas/AppError"
-                            }
-                          }
-                        }
-                    }
-                }
-            }
-        },
         "/my/groups/{groupID}":{
             "get":{
                 "summary": "Gets a group of an user's collection.",
@@ -387,6 +285,67 @@
                         }
                     }
                 }       
+            },
+            "put":{
+                "tags": [
+                    "User"
+                ],
+                "summary": "Edits a group from an user's collection.",
+                "requestBody":{
+                    "description": "Group name to edit and the respective new group name and new description",
+                    "required": true,
+                    "content":{
+                        "application/json":{
+                            "schema": {
+                                "$ref": "#/components/schemas/GroupEditBody"
+                            }
+                        }
+                    }
+                },
+                "parameters":[
+                    {
+                        "name": "groupID",
+                        "in": "path",
+                        "required": true,
+                        "description": "Group to edit.",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "example": "12312314"
+                    }
+                ],
+                "responses":{
+                    "200": {
+                        "description": "The group got succesfully edited",
+                        "content":{
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/GroupEditResponse"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid or missing group name to edit or missing new group name and new description.",
+                        "content": {
+                          "application/json": {
+                            "schema": {
+                              "$ref": "#/components/schemas/AppError"
+                            }
+                          }
+                        }
+                    },
+                    "401": {
+                        "description": "Missing or Invalid API token. The user is not authenticated.",
+                        "content": {
+                          "application/json": {
+                            "schema": {
+                              "$ref": "#/components/schemas/AppError"
+                            }
+                          }
+                        }
+                    }     
+                }
             },
             "delete":{
                 "tags": [
@@ -499,12 +458,72 @@
                         }
                     }
                 }    
+            },
+            "post":{
+                "tags": [
+                    "User"
+                ],
+                "summary": "Adds a game to a group.",
+                "parameters": [
+                    {
+                        "name": "groupID",
+                        "in": "path",
+                        "required": true,
+                        "description": "Group's ID to add the game.",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "example": "12312341"
+                    },
+                    {
+                        "name": "gameID",
+                        "in": "path",
+                        "required": true,
+                        "description": "Game's ID to add.",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "example": "21342115133412"
+                    }
+                 ],
+                "responses":{
+                    "200": {
+                        "description": "The game is now in the group",
+                        "content": {
+                          "application/json": {
+                            "schema": {
+                              "$ref": "#/components/schemas/GameOperationResponse"
+                            }
+                          }
+                        }
+                      },
+                    "400": {
+                        "description": "Group or game name's missing.",
+                        "content": {
+                          "application/json": {
+                            "schema": {
+                              "$ref": "#/components/schemas/AppError"
+                            }
+                          }
+                        }
+                      },
+                    "401": {
+                        "description": "Missing or Invalid API token. The user is not authenticated.",
+                        "content": {
+                          "application/json": {
+                            "schema": {
+                              "$ref": "#/components/schemas/AppError"
+                            }
+                          }
+                        }
+                    }
+                }
             }
         },
         "/games/{gameID}":{
             "get":{
                 "tags": [
-                    "User"
+                    "Global"
                 ],
                 "summary": "Gets the details of a game.",
                 "parameters": [
@@ -815,14 +834,7 @@
             "GroupEditBody":{
                 "type": "object",
                 "description": "Game to edit body.",
-                "required": [
-                    "id"
-                ],
                 "properties": {
-                    "id":{
-                        "type": "string",
-                        "example": "128364192"
-                    },
                     "newGroupName":{
                         "type": "string",
                         "example": "New Name"

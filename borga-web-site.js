@@ -43,7 +43,7 @@ module.exports = function (services, guest_token) {
 		const header = 'Find Game Result'
 		const gameName = req.query.game
 		try{
-			const gameRes = await services.getGameWithName(gameName)
+			const gameRes = await services.searchGameByName(gameName)
 			res.render('games_list', {header, gameName, games: gameRes.games, allowSave: true})
 		}catch(err){
 			onError(res, err)
@@ -90,7 +90,7 @@ module.exports = function (services, guest_token) {
 	async function saveGame(req,res){
 		try{
 			const groupID = req.body.groupSelected
-			const gameID = req.body.gameID
+			const gameID = req.params.gameID
 			await services.addGameToGroup(groupID, gameID, getToken())
 			res.redirect("/groups")
 		}catch(err){
@@ -132,6 +132,17 @@ module.exports = function (services, guest_token) {
 		}
 	}
 
+	
+
+	async function getGroupEdition(req, res){
+		try {
+			res.render('group_edition', {groupID: req.params.groupID})
+		} catch (error) {
+			console.log(err)
+			onError(res, err)
+		}
+	}
+
 	const router = express.Router()
 
 	router.use(require('body-parser').urlencoded({ extended: true }));
@@ -150,20 +161,19 @@ module.exports = function (services, guest_token) {
 	//router.post('/logout', doLogout);
 
 	// Search page	
-	router.get('/game', findInBorgaGames)
+	router.get('/games', findInBorgaGames) // DONE
+	router.get('/popular', getMostPopular) // DONE
+	router.get('/groups', getGroups) // DONE
+	router.post('/groups', createGroup) // DONE
 	
+	router.get('/games/:gameID', getGameDetails) // DONE
+	
+	router.post('/groups/selection', getGroupSelect) // DONE
+	router.post('/groups/:gameID', saveGame) // DONE
+	
+	router.get('/groups/:groupID', getMyGroupDetails) // DONE
 
-	router.get('/groups', getGroups)
-	router.post('/groups', createGroup)
-
-	router.get('groups/:groupID', getMyGroupDetails)
-	router.post('/game', saveGame)
-
-	router.post('/group-select', getGroupSelect)
-
-	router.get('/games/:gameID', getGameDetails)
-
-	router.get('/games/popular', getMostPopular)
+	router.get('/groups/edition/:groupID', getGroupEdition) // DONE
 
 	return router
 }

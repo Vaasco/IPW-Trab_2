@@ -1,1 +1,23 @@
 <strong> Home</strong>
+
+<h3>Login</h3>
+<form action="/login" method="POST">
+	<label for="txtUsername">Username:</label>
+	<input type="text" id="txtUsername" name="username">
+	<br><br>
+	<label for="txtPassword">Password:</label>
+	<input type="password" id="txtPassword" name="password">
+	<br><br>
+	<input type="submit" value="Login">
+</form>
+
+<h3>Register</h3>
+<form action="/home" method="GET">
+    <label for="user-name">Username: </label><br>
+    <input type='text' id='user-name'  required><br><br>
+    <label for="password">Password: </label><br>
+    <input type='text' id='password'><br><br>
+    <input type='submit' id="edit-{{groupID}}" value='Register'>
+</form>
+
+

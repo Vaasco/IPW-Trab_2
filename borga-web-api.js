@@ -30,7 +30,7 @@ module.exports = function (services){
      * @param err the error.
      */    
     function onError(res, err) {
-        logs.fail('[ERROR', err);
+        logs.fail('ERROR', JSON.stringify(err, null, 2));
 		switch (err.name) {
 			case 'NOT_FOUND': 
 				res.status(404);
@@ -73,10 +73,10 @@ module.exports = function (services){
      * @param req the request.
      * @param res the response.
      */
-    async function getGameByName(req, res){
+    async function searchGameByName(req, res){
         try{
-            const gameName = req.params.gameName.toLowerCase()
-            const game = await services.getGameWithName(gameName)
+            const gameName = req.query.gameName.toLowerCase()
+            const game = await services.searchGameByName(gameName)
             res.json(game)   
         }
         catch(err){
@@ -126,9 +126,9 @@ module.exports = function (services){
      */
     async function addGameByID(req, res){
         try{
-            const body = req.body
-            const gameID = body.gameID
-            const groupID = body.groupID
+            const params = req.params
+            const gameID = params.gameID
+            const groupID = params.groupID
             const added = await services.addGameToGroup(groupID, gameID, getBearerToken(req))
             res.json(added)
         }
@@ -146,10 +146,13 @@ module.exports = function (services){
     async function editGroup(req, res){
         try{
             const body = req.body
-            const newGroup = await services.editMyGroup(body.id, body.newGroupName
-                , body.newDescription
-                ,getBearerToken(req)
-                )
+            const groupId = req.params.groupID
+            const newGroup = await services.editMyGroup(
+                groupId, 
+                body.newGroupName, 
+                body.newGroupDescription, 
+                getBearerToken(req)
+            )
             res.json(newGroup) 
         }
         catch(err){
@@ -239,29 +242,26 @@ module.exports = function (services){
     router.use(express.json());
 
          
-    router.get("/games/popular", getMostPopularGames)
-    router.get("/games/:gameName", getGameByName)
-    router.get("/games/:gameID", getGameDetails)
+    router.get("/games/popular", getMostPopularGames) // DONE
+    router.get("/games", searchGameByName) // DONE
+    router.get("/games/:gameID", getGameDetails) // DONE
 
-    router.post("/register", createNewUser)
+    router.post("/register", createNewUser) // DONE
     
-
+    // Resource /my/groups
     router.get("/my/groups", getMyGroups)
     router.post("/my/groups", addGroup)
 
-    // Resource /my/groups
-    router.put("/my/groups/edit", editGroup)
+    router.put("/my/groups/:groupID", editGroup) // DONE
 
-    // Resource /my/groups/game
-    router.post("/my/groups/game", addGameByID)
-
-    // Resource /my/groups/<groupName>
-    router.get("/my/groups/:groupID", getGroupDetails)
-    router.delete("/my/groups/:groupID", deleteGroupById)
+    // Resource /my/groups/<groupID>
+    router.get("/my/groups/:groupID", getGroupDetails) // DONE
+    router.delete("/my/groups/:groupID", deleteGroupById) // DONE
+    
 
     // Resource /my/groups/<groupID>/<gameID>
-    router.delete("/my/groups/:groupID/:gameID", deleteGameFromGroup)
-
+    router.delete("/my/groups/:groupID/:gameID", deleteGameFromGroup) // DONE
+    router.post("/my/groups/:groupID/:gameID", addGameByID)
 
     return router
 }

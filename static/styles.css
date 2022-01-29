@@ -10,10 +10,16 @@
 }
 
 .bi-hover:hover{
-    color: #316FFF;
-    
+    color: #316FFF;  
 }
 
 .bi-hover{
     font-size: 2rem;
 }
+
+.game-item{
+    display: inline-flex;
+    flex-direction: column;
+    justify-content: space-evenly;
+}
+

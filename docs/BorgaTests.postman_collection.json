@@ -21,28 +21,16 @@
 							}
 						}
 					],
-					"protocolProfileBehavior": {
-						"disableBodyPruning": true
-					},
 					"request": {
 						"method": "GET",
 						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": "",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
-						},
 						"url": {
-							"raw": "{{API_BASE_URL}}/global/popular",
+							"raw": "{{API_BASE_URL}}/games/popular",
 							"host": [
 								"{{API_BASE_URL}}"
 							],
 							"path": [
-								"global",
+								"games",
 								"popular"
 							]
 						},
@@ -51,7 +39,21 @@
 					"response": []
 				},
 				{
-					"name": "Get game by name (Pandemic)",
+					"name": "Search game by name",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"\r",
+									"var jsonData = pm.response.json();\r",
+									"pm.collectionVariables.set(\"GAME_ID\", jsonData.games[0].id);\r",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
 					"protocolProfileBehavior": {
 						"disableBodyPruning": true
 					},
@@ -68,19 +70,17 @@
 							}
 						},
 						"url": {
-							"raw": "{{API_BASE_URL}}/global/game/:gameName",
+							"raw": "{{API_BASE_URL}}/games?gameName=Pandemic",
 							"host": [
 								"{{API_BASE_URL}}"
 							],
 							"path": [
-								"global",
-								"game",
-								":gameName"
+								"games"
 							],
-							"variable": [
+							"query": [
 								{
 									"key": "gameName",
-									"value": null
+									"value": "Pandemic"
 								}
 							]
 						}
@@ -89,22 +89,24 @@
 				},
 				{
 					"name": "Create new user",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var jsonData = pm.response.json();\r",
+									"pm.collectionVariables.set(\"GUEST_TOKEN\", jsonData.token);"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
 					"request": {
-						"auth": {
-							"type": "bearer",
-							"bearer": [
-								{
-									"key": "token",
-									"value": "abd331d7-fd48-4054-9b73-7b7edf2941a6",
-									"type": "string"
-								}
-							]
-						},
 						"method": "POST",
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"userName\": \"costakilapada\"\r\n}",
+							"raw": "{\r\n    \"userName\": \"userTeste\"\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -122,6 +124,53 @@
 						}
 					},
 					"response": []
+				},
+				{
+					"name": "Get game details",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{API_BASE_URL}}/games/:gameID",
+							"host": [
+								"{{API_BASE_URL}}"
+							],
+							"path": [
+								"games",
+								":gameID"
+							],
+							"variable": [
+								{
+									"key": "gameID",
+									"value": "{{GAME_ID}}"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"auth": {
+				"type": "noauth"
+			},
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
 				}
 			]
 		},
@@ -133,12 +182,25 @@
 					"item": [
 						{
 							"name": "Create a new group",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"var jsonData = pm.response.json();\r",
+											"const groupObj = jsonData.groupObject\r",
+											"pm.collectionVariables.set(\"GROUP_ID\", groupObj.id);"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
 							"request": {
 								"method": "POST",
 								"header": [],
 								"body": {
 									"mode": "raw",
-									"raw": "{\r\n    \"groupName\": \"teste\",\r\n    \"groupDescription\": \"Group for testing purposes\"\r\n}",
+									"raw": "{\r\n    \"groupName\": \"Jogos quero jogar.\",\r\n    \"groupDescription\": \"Este grupo contém os jogos que quero jogar.\"\r\n}",
 									"options": {
 										"raw": {
 											"language": "json"
@@ -179,21 +241,11 @@
 						{
 							"name": "Edit an existing group",
 							"request": {
-								"auth": {
-									"type": "bearer",
-									"bearer": [
-										{
-											"key": "token",
-											"value": "abd331d7-fd48-4054-9b73-7b7edf2941a6",
-											"type": "string"
-										}
-									]
-								},
-								"method": "POST",
+								"method": "PUT",
 								"header": [],
 								"body": {
 									"mode": "raw",
-									"raw": "{\r\n    \"groupName\": \"teste\",\r\n    \"newGroupName\": \"teste modificado\",\r\n    \"groupDescription\": \"Descrição modificada\"\r\n}",
+									"raw": "{\r\n    \"newGroupName\": \"Jogos que já joguei.\",\r\n    \"newGroupDescription\": \"Este grupo contém os jogos de tabuleiro que já joguei.\"\r\n}",
 									"options": {
 										"raw": {
 											"language": "json"
@@ -201,48 +253,19 @@
 									}
 								},
 								"url": {
-									"raw": "{{API_BASE_URL}}/my/groups/edit",
+									"raw": "{{API_BASE_URL}}/my/groups/:groupID",
 									"host": [
 										"{{API_BASE_URL}}"
 									],
 									"path": [
 										"my",
 										"groups",
-										"edit"
-									]
-								}
-							},
-							"response": []
-						},
-						{
-							"name": "Delete group by name",
-							"request": {
-								"auth": {
-									"type": "bearer",
-									"bearer": [
-										{
-											"key": "token",
-											"value": "abd331d7-fd48-4054-9b73-7b7edf2941a6",
-											"type": "string"
-										}
-									]
-								},
-								"method": "DELETE",
-								"header": [],
-								"url": {
-									"raw": "{{API_BASE_URL}}/my/groups/:groupName",
-									"host": [
-										"{{API_BASE_URL}}"
-									],
-									"path": [
-										"my",
-										"groups",
-										":groupName"
+										":groupID"
 									],
 									"variable": [
 										{
-											"key": "groupName",
-											"value": "teste modificado"
+											"key": "groupID",
+											"value": "{{GROUP_ID}}"
 										}
 									]
 								}
@@ -252,32 +275,47 @@
 						{
 							"name": "Get my group details",
 							"request": {
-								"auth": {
-									"type": "bearer",
-									"bearer": [
-										{
-											"key": "token",
-											"value": "abd331d7-fd48-4054-9b73-7b7edf2941a6",
-											"type": "string"
-										}
-									]
-								},
 								"method": "GET",
 								"header": [],
 								"url": {
-									"raw": "{{API_BASE_URL}}/my/groups/:groupName",
+									"raw": "{{API_BASE_URL}}/my/groups/:groupID",
 									"host": [
 										"{{API_BASE_URL}}"
 									],
 									"path": [
 										"my",
 										"groups",
-										":groupName"
+										":groupID"
 									],
 									"variable": [
 										{
-											"key": "groupName",
-											"value": "teste modificado"
+											"key": "groupID",
+											"value": "{{GROUP_ID}}"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Delete group by ID",
+							"request": {
+								"method": "DELETE",
+								"header": [],
+								"url": {
+									"raw": "{{API_BASE_URL}}/my/groups/:groupID",
+									"host": [
+										"{{API_BASE_URL}}"
+									],
+									"path": [
+										"my",
+										"groups",
+										":groupID"
+									],
+									"variable": [
+										{
+											"key": "groupID",
+											"value": "{{GROUP_ID}}"
 										}
 									]
 								}
@@ -290,23 +328,13 @@
 					"name": "Game Requests",
 					"item": [
 						{
-							"name": "Add game by name",
+							"name": "Add game to group",
 							"request": {
-								"auth": {
-									"type": "bearer",
-									"bearer": [
-										{
-											"key": "token",
-											"value": "abd331d7-fd48-4054-9b73-7b7edf2941a6",
-											"type": "string"
-										}
-									]
-								},
 								"method": "POST",
 								"header": [],
 								"body": {
 									"mode": "raw",
-									"raw": "{\r\n    \"groupName\": \"teste\",\r\n    \"gameName\": \"Monopoly\"\r\n}",
+									"raw": "",
 									"options": {
 										"raw": {
 											"language": "json"
@@ -314,53 +342,54 @@
 									}
 								},
 								"url": {
-									"raw": "{{API_BASE_URL}}/my/groups/game",
+									"raw": "{{API_BASE_URL}}/my/groups/:groupID/:gameID",
 									"host": [
 										"{{API_BASE_URL}}"
 									],
 									"path": [
 										"my",
 										"groups",
-										"game"
+										":groupID",
+										":gameID"
+									],
+									"variable": [
+										{
+											"key": "groupID",
+											"value": "{{GROUP_ID}}"
+										},
+										{
+											"key": "gameID",
+											"value": "{{GAME_ID}}"
+										}
 									]
 								}
 							},
 							"response": []
 						},
 						{
-							"name": "Delete game by name",
+							"name": "Delete game from group",
 							"request": {
-								"auth": {
-									"type": "bearer",
-									"bearer": [
-										{
-											"key": "token",
-											"value": "abd331d7-fd48-4054-9b73-7b7edf2941a6",
-											"type": "string"
-										}
-									]
-								},
 								"method": "DELETE",
 								"header": [],
 								"url": {
-									"raw": "{{API_BASE_URL}}/my/groups/:groupName/:gameName",
+									"raw": "{{API_BASE_URL}}/my/groups/:groupID/:gameID",
 									"host": [
 										"{{API_BASE_URL}}"
 									],
 									"path": [
 										"my",
 										"groups",
-										":groupName",
-										":gameName"
+										":groupID",
+										":gameID"
 									],
 									"variable": [
 										{
-											"key": "groupName",
-											"value": "teste modificado"
+											"key": "groupID",
+											"value": "{{GROUP_ID}}"
 										},
 										{
-											"key": "gameName",
-											"value": "Pandemic"
+											"key": "gameID",
+											"value": "{{GAME_ID}}"
 										}
 									]
 								}
@@ -369,6 +398,36 @@
 						}
 					]
 				}
+			],
+			"auth": {
+				"type": "bearer",
+				"bearer": [
+					{
+						"key": "token",
+						"value": "{{GUEST_TOKEN}}",
+						"type": "string"
+					}
+				]
+			},
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				}
 			]
 		}
 	],
@@ -376,6 +435,22 @@
 		{
 			"key": "API_BASE_URL",
 			"value": "localhost:8888/api"
+		},
+		{
+			"key": "GUEST_TOKEN",
+			"value": "fz3zMebxQXybYskc567j5w"
+		},
+		{
+			"key": "GUEST_TOKEN",
+			"value": ""
+		},
+		{
+			"key": "GAME_ID",
+			"value": ""
+		},
+		{
+			"key": "GROUP_ID",
+			"value": ""
 		}
 	]
 }
