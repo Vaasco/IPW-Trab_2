@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "9aaf9e57-3ea8-4a5e-bc7e-cd2f58617901",
+		"_postman_id": "726c74a8-5141-4691-97eb-915def2acd91",
 		"name": "BorgaTests",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
@@ -45,10 +45,8 @@
 							"listen": "test",
 							"script": {
 								"exec": [
-									"\r",
 									"var jsonData = pm.response.json();\r",
-									"pm.collectionVariables.set(\"GAME_ID\", jsonData.games[0].id);\r",
-									""
+									"pm.collectionVariables.set(\"GAME_ID\", jsonData.games[0].id);"
 								],
 								"type": "text/javascript"
 							}
@@ -106,7 +104,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"userName\": \"userTeste\"\r\n}",
+							"raw": "{\r\n    \"userName\": \"userteste\",\r\n    \"password\": \"123456\"\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
