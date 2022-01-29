@@ -3,6 +3,14 @@
 const passport = require("passport")
 const session = require("express-session")
 
+passport.serializeUser((userInfo, done) => {
+    done(null, userInfo)
+})
+
+passport.deserializeUser((userInfo, done) => {
+    done(null, userInfo)
+})
+
 module.exports = function (es_spec, guest){
 
     const games_data = require('./borga-games-data');
@@ -24,7 +32,7 @@ module.exports = function (es_spec, guest){
 	}));
     
     borga.use(passport.initialize());
-	borga.use(passport.session());
+    borga.use(passport.session());
 
     borga.set('view engine', 'hbs');
 

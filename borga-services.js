@@ -18,12 +18,17 @@ const GAME_NOT_IN_GROUP = "Group has no game with this id."
 const GAME_NOT_IN_COLLECTION = "Game collection has no game with this id"
 const NAME_OR_DESCRIPTION_REQUIRED = "Need at least a new group name or a new description to edit a group."
 const USERNAME_REQUIRED = "Username required."
+const PASSWORD_REQUIRED = "Password required."
 const GAME_NAME_MISSING = "Search name required."
+const GROUP_NAME_EMPTY = "Group's name can't be empty."
+const GROUP_NAME_MAX_LENGTH = 20
+const GROUP_LENGTH = 'Group length exceeded'
+const INVALID_CREDENTIAL = 'Invalid credentials'
 
 module.exports = (games_data, data_mem) => {
 
     /**
-     * Throws an error if a group with thos id doesn't exist in the database
+     * Throws an error if a group with this id doesn't exist in the database
      */
     async function requireGroup(groupID, user){
         if(!(await data_mem.hasGroup(groupID, user))) throw errors.INVALID_PARAM(INVALID_GROUP)
@@ -34,11 +39,12 @@ module.exports = (games_data, data_mem) => {
      * @param userName 
      * @returns user response = {userName: "User", token: "Token"} 
      */
-    async function createNewUser(userName){
+    async function createNewUser(userName, password){
         if(!userName) throw errors.MISSING_PARAM(USERNAME_REQUIRED)
+        if(!password) throw errors.MISSING_PARAM(PASSWORD_REQUIRED)
         if(userName.length <= 4 || userName.length >= 16) 
             throw errors.INVALID_PARAM(USER_LENGHT_ERROR)
-        const result = await data_mem.createNewUser(userName)
+        const result = await data_mem.createNewUser(userName, password)
         if(result.success) 
             return {userName, token: result.token}
         else if(result.token)  
@@ -46,6 +52,17 @@ module.exports = (games_data, data_mem) => {
         else
            throw errors.INVALID_PARAM(USER_ALREADY_EXISTS)
     }
+    
+    async function validateAndGetUser(username, password) {
+        const userExists = await data_mem.hasUser(username)
+        if(!userExists) throw errors.INVALID_PARAM(INVALID_CREDENTIAL)
+        if (!username || !password) {
+			throw errors.MISSING_PARAM(INVALID_CREDENTIAL);
+		}
+		const user = await data_mem.getUser(username);
+		if (user.password !== password) throw errors.UNAUTHENTICATED(INVALID_CREDENTIAL);
+		return user;
+	} 
     
     /**
      * Gets the user name associated to a token.
@@ -140,6 +157,8 @@ module.exports = (games_data, data_mem) => {
      async function createNewGroup(groupName, groupDescription, token){
         const userName = await getUsername(token)
         if(!groupName) throw errors.MISSING_PARAM(MISSING_GROUP_ID)
+        if(groupName.length == 0) throw errors.INVALID_PARAM(GROUP_NAME_EMPTY)
+        if(groupName.length > GROUP_NAME_MAX_LENGTH) throw errors.INVALID_PARAM(GROUP_LENGTH)
         const description = groupDescription || ""
         const groupResponse = await data_mem.createNewGroup(groupName, description, userName)
         return groupResponse
@@ -156,7 +175,7 @@ module.exports = (games_data, data_mem) => {
      async function editGroup(groupID, newGroupName, newDescription, token){
         const user = await getUsername(token)
         if(!groupID) throw errors.MISSING_PARAM(MISSING_GROUP_ID)
-        if(!newGroupName && !newDescription) throw errors.MISSING_PARAM(NAME_OR_DESCRIPTION_REQUIRED)
+        if(newGroupName.length > GROUP_NAME_MAX_LENGTH) throw errors.INVALID_PARAM(GROUP_LENGTH)
         await requireGroup(groupID, user)
         const groupResponse = await data_mem.editGroup(groupID, newGroupName, newDescription, user) 
         return groupResponse
@@ -229,8 +248,8 @@ module.exports = (games_data, data_mem) => {
             //await data_mem.reset() // For debugging and testing purposes
             logs.debug(ONSTART_LOG_TAG, "SAVING GAME MECHANICS AND CATEGORIES")
             await saveGameInfo()
-            logs.debug(ONSTART_LOG_TAG, "CREATING GUEST INDEX")
-            await data_mem.createGuestIndex()
+            //logs.debug(ONSTART_LOG_TAG, "CREATING GUEST INDEX")
+            //await data_mem.createGuestIndex()
         }catch(err){
             logs.fail("ERROR", JSON.stringify(err, null, 4))
         }
@@ -248,6 +267,7 @@ module.exports = (games_data, data_mem) => {
         deleteGroup: deleteGroup,
         deleteGameByID: deleteGameByID,
         createNewUser: createNewUser,
+        validateAndGetUser: validateAndGetUser,
         saveInfo: saveGameInfo,
         setup: setup
     }

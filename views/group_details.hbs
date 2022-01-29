@@ -11,7 +11,7 @@
         <tr>
             <td>Games:</td>
             <td>
-                <ul>
+                <ul class="ulist">
                     {{#with group.games}}
                         {{#each this}}
                             <li class="game-item", id="game-{{this.id}}">
@@ -29,10 +29,12 @@
             </td>
         </tr>
     </table>
-{{/if}}
-
 
 <script src="/public/client.js"></script>
 <script>
-     setupGameDelete("{{group.id}}")
+    setupGameDelete({{groupID}})
 </script>
+{{/if}}
+
+
+

@@ -1,10 +1,12 @@
-<h1>Login</h1>
+<h3>Login</h3>
 <form action="/login" method="POST">
-	<label for="txtUsername">Username:</label>
-	<input type="text" id="txtUsername" name="username">
-	<br><br>
-	<label for="txtPassword">Password:</label>
-	<input type="password" id="txtPassword" name="password">
-	<br><br>
-	<input type="submit" value="Login">
+    <label for="txtUsername">Username:</label>
+    <input type="text" id="txtUsername" name="username" required>
+    <br><br>
+    <label for="txtPassword">Password:</label>
+    <input type="password" id="txtPassword" name="password" required>
+    <br><br>
+    <input type="submit" value="Login">
 </form>
+
+<p>Don't have an account? <a href="/register">Sign up</a><p>

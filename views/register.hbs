@@ -1,9 +1,10 @@
-<h1>Register</h1>
-<form action="/home" method="GET">
-    <h2>Register: </h2>
+<h3>Register</h3>
+<form action="/register" method="POST">
     <label for="user-name">Username: </label><br>
-    <input type='text' id='user-name'  required><br><br>
-    <label for="password">Password: </label><br>
-    <input type='text' id='password'><br><br>
-    <input type='submit' id="edit-{{groupID}}" value='Add'>
+    <input type='text' id='user-name' name="userName" required><br><br>
+    <label for="reg-pass">Password: </label><br>
+    <input type='password' id='reg-pass' name="password" required><br><br>
+    <input type='submit' value='Register'>
 </form>
+
+<p>Already have an account? <a href="/login">Login</a><p>

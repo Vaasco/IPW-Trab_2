@@ -1,16 +1,19 @@
+'use strict'
+
 function setupGroupDelete(){
     const deleteButtons = document.querySelectorAll('.delete-groups')
-    deleteButtons.forEach(butDel => {butDel.onclick = deleteGroup})
-    return
+    deleteButtons.forEach(butDel => {butDel.onclick = onDeleteGroup})
+    return 
 
-    async function deleteGroup(){
+    async function onDeleteGroup(e){
+        e.preventDefault()
+        console.log(this)
         const id = this.id.replace("btn-group-", "")
         try{
             await apiDeleteGroup(id)
             deleteListItem(id)
         }catch(err){
             alert(err)
-            // Alterei agora
         }
     }
 
@@ -21,7 +24,7 @@ function setupGroupDelete(){
                 {
                     method: 'DELETE',
                     headers: {
-                        Authentication: "bearer fz3zMebxQXybYskc567j5w"
+                        Authentication: "bearer <token>"
                     }
                 }
             )
@@ -46,11 +49,11 @@ function setupGroupDelete(){
 
 function setupGameDelete(groupID){
     const deleteButtons = document.querySelectorAll('.delete-games')
-    deleteButtons.forEach(butDel => {butDel.onclick = deleteGame})
+    deleteButtons.forEach(butDel => {butDel.onclick = onDeleteGame})
     return
 
-    async function deleteGame(){
-        
+    async function onDeleteGame(e){
+        e.preventDefault()
         const id = this.id.replace("btn-game-", "")
         try{
             await apiDeleteGame(id)
@@ -58,6 +61,7 @@ function setupGameDelete(groupID){
         }catch(err){
             alert(err)
         }
+
     }
 
     async function apiDeleteGame(gameID){
@@ -89,42 +93,44 @@ function setupGroupEdit(groupID){
 
     const editButton = document.querySelector(`#edit-${groupID}`)
     editButton.onclick = (e) => {
+        e.preventDefault()
         const nameInput = document.querySelector("#group-name")
         const descriptionInput = document.querySelector("#group-description")
-        editGroup(nameInput.value, descriptionInput.value)
+        onEditGroup(nameInput.value, descriptionInput.value)
     }
     
-    async function editGroup(newName, newDescription){
+    async function onEditGroup(newName, newDescription){
+
+        const apiEditGroup = async function (groupID){
+            
+            const body = {newGroupName: newName, newGroupDescription: newDescription}
+            const editReq = await fetch(
+                '/api/my/groups/' + groupID,
+                {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(body, null, 4)
+                }
+            )
+            console.log(editReq)
+            if(editReq.status === 200){
+                return
+            }
+            throw new Error(
+                'Failed to edit group with id ' + groupID + '\n' +
+                editReq.status + ' ' + editReq.statusText 
+            )
+        }
+
         try{
             await apiEditGroup(groupID)
-            editListItem(groupID)
+            location.assign("/groups")
         }catch(err){
+            console.log(err)
             alert(err)
-        }
-
-        async function apiEditGroup(groupID){
-            try {
-                const editReq = await fetch(
-                    '/api/my/groups/' + groupID,
-                    {method: 'PUT', body: {newGroupName: newName, newGroupDescription: newDescription}}
-                )
-                if(editReq.status === 200){
-                    return
-                }
-            } catch (error) {
-                throw new Error(
-                    'Failed to edit group with id ' + groupID + '\n' +
-                    editReq.status + ' ' + editReq.statusText 
-                )
-            }
-        }
-
-        function editListItem(groupID) {
-            //const listEntryId = '#group-' + groupID;
-            //const listEntry = document.querySelector(listEntryId);
-            //listEntry.parentNode.removeChild(listEntry);
         }
     }
 
-    
 }

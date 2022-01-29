@@ -6,6 +6,7 @@ module.exports = {
 
 	guest: {
 		user : 'guest',
+		password: '123456',
 		token: 'fz3zMebxQXybYskc567j5w'
 	}
 	

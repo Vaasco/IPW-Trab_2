@@ -4,14 +4,14 @@
     <h1>No groups</h1>
 {{else}}
     <h1>My Groups</h1>
-    <ul>
+    <ul class="ulist">
         {{#each groups}}
-            <li class="game-item" id="item-{{id}}">
-                {{name}}
-                <form>
-                    <input type="submit" formaction="/groups/{{id}}" value="Details">
-                    <button class="delete-groups" id="btn-group-{{id}}">Delete</button>
-                    <button class="edit-groups" formaction="/groups/edition/{{id}}" >Edit</button>
+            <li class="list-item" id="item-{{id}}">
+                <span class="group-name"> {{name}} </span>
+                <form class="button-group">
+                    <button class="btn btn-outline-primary small" formaction="/groups/{{id}}">Details</button>
+                    <button class="btn btn-outline-danger delete-groups small" id="btn-group-{{id}}">Delete</button>
+                    <button class="btn btn-outline-success edit-groups small" formaction="/groups/edition/{{id}}" >Edit</button>
                 </form> 
             </li>
         {{/each}}

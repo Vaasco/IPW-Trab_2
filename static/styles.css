@@ -1,5 +1,5 @@
 /*This id removes the style of a button*/
-#remove-button{
+.remove-button{
     background: none;
 	color: inherit;
 	border: none;
@@ -7,6 +7,10 @@
 	font: inherit;
 	cursor: pointer;
 	outline: inherit;
+}
+
+body{
+    background-color: rgb(255, 255, 255);
 }
 
 .bi-hover:hover{
@@ -17,9 +21,46 @@
     font-size: 2rem;
 }
 
-.game-item{
+.list-item{
     display: inline-flex;
+    flex-direction: row;
+    width: 100%;
+    justify-content: space-between;
+    text-align: right;
+}
+
+.group-name{
+    font-size: 20px;
+    margin-right: 50px;
+    align-self:right;
+    margin-top: 10px;
+}
+
+.ulist{
+    display: flex;
     flex-direction: column;
     justify-content: space-evenly;
+    width: 100%;
+    margin: 0;
+    padding: 0 20px;
+}
+
+.button-group{
+    width: 30%;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-evenly;
+    margin-top: 10px;
+}
+
+.button-group button {
+    width: 22%;
+}
+
+
+.button-group:after {
+    content: "";
+    clear: both;
+    display: table;
 }
 

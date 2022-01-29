@@ -52,7 +52,7 @@ module.exports = function (es_spec, guest){
         try{
             await fetch(
                 `${tokensUrl}/_doc/${guest.token}`,
-                putConfigs({userName: guest.user})
+                putConfigs({userName: guest.user, password: guest.password})
             )
             await fetch(userUrl(guest.user), {method: 'PUT'})
         }catch(err){
@@ -68,9 +68,10 @@ module.exports = function (es_spec, guest){
     /**
      * Creates a token and links it to the given name creating a new user.
      * @param name to link to the token.
+     * @param password user password
      * @returns true if the new user was created succesfully.
      */
-    async function createNewUser(userName){
+    async function createNewUser(userName, password){
        const name = userName.toLowerCase()
        try{
         const userExists = await hasUser(name)
@@ -78,7 +79,7 @@ module.exports = function (es_spec, guest){
         const token = crypto.randomUUID()
         const response = await fetch(
             `${tokensUrl}/_doc/${token}`,
-            putConfigs({userName: name})
+            putConfigs({userName: name, password})
         )
         const createGroupIdx = await fetch(userUrl(name), {method: 'PUT'})
         return {
@@ -117,10 +118,26 @@ module.exports = function (es_spec, guest){
         const tokensResponse = await response.json()
         const usersObjs = tokensResponse.hits.hits
         return usersObjs.some((obj) => {
-            logs.debug("HAS_USER", obj._source.userName)
-            logs.debug("HAS_USER", name)
             return obj._source.userName === name
         })
+    }
+
+    /**
+     * 
+     * @param {*} game 
+     * @returns 
+     */
+    async function getUser(userName){
+        const response = await fetch(
+            `${tokensUrl}/_search`
+        )
+        const tokensResponse = await response.json()
+        
+        const usersHits = tokensResponse.hits.hits
+        const userObj = usersHits
+            .find((obj) => obj._source.userName === userName )
+        userObj._source.token = userObj._id
+        return userObj._source
     }
 
     /**
@@ -260,11 +277,11 @@ module.exports = function (es_spec, guest){
        try{
             const groupToEdit = await getGroup(groupID, userName)
             const newDesc = newDescription || groupToEdit.description 
-            const newName = givenName || groupToEdit.groupName
+            const newName = givenName || groupToEdit.name
             groupToEdit.name = newName
             groupToEdit.description = newDesc
             const response = await fetch(
-                `${userUrl(userName)}/_doc/${groupID}`,
+                `${userUrl(userName)}/_doc/${groupID}?refresh=wait_for`,
                  putConfigs(groupToEdit)
             )
             return {success: success(response.status), groupObject: groupToEdit}
@@ -290,7 +307,7 @@ module.exports = function (es_spec, guest){
             const group = await getGroup(groupID, userName)
             group.games.push(gameID)
             const response = await fetch(
-                `${userUrl(userName)}/_doc/${groupID}`,
+                `${userUrl(userName)}/_doc/${groupID}?refresh=wait_for`,
                 putConfigs(group)
             )
             const game = await getGame(gameID)
@@ -315,6 +332,7 @@ module.exports = function (es_spec, guest){
                 return {id: gameID, name}
             })
             group.games = await Promise.all(gamesPromise)
+            group.id = groupID
             return group
         }catch(err){
             dbError(err)
@@ -331,7 +349,7 @@ module.exports = function (es_spec, guest){
         try{
             const group = await getGroup(groupID, userName)
             const response = await fetch(
-                `${userUrl(userName)}/_doc/${groupID}`,
+                `${userUrl(userName)}/_doc/${groupID}?refresh=wait_for`,
                 {method: "DELETE"}
             )
             return {success: success(response.status), groupObject: {name: group.name}}
@@ -355,7 +373,7 @@ module.exports = function (es_spec, guest){
             group.games = games.filter(id => gameID !== id)
             const gameRemoved = await getGame(gameID)
             const response = await fetch(
-                `${userUrl(userName)}/_doc/${groupID}`,
+                `${userUrl(userName)}/_doc/${groupID}?refresh=wait_for`,
                 putConfigs(group)
             )
             return {success: success(response.status), responseObject: {groupName: group.name, gameName: gameRemoved.name}}
@@ -474,11 +492,13 @@ module.exports = function (es_spec, guest){
         deleteGroup: deleteGroup,
         hasGroup: hasGroup,
         hasGame: hasGameByID,
+        hasUser: hasUser,
         getGame: getGame,
         addGameToCollection: addGameToCollection,
         addGameToGroup: addGameToGroup,
         deleteGameFromGroup: deleteGameFromGroup,
         createNewUser: createNewUser,
+        getUser: getUser,
         tokenToUsername: tokenToUsername,
         saveCategories: saveCategories,
         saveMechanics: saveMechanics,

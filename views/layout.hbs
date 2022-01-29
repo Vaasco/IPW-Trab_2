@@ -28,9 +28,25 @@
 						<li class="nav-item">
 							<a class="nav-link active" aria-current="page" href="/popular">Popular</a>
 						</li>
-						<li class="nav-item">
-							<a class="nav-link active" aria-current="page" href="/groups">Groups</a>
-						</li>
+						{{#if isLoggedIn}}
+							<li class="nav-item">
+								<a class="nav-link active" aria-current="page" href="/groups">Groups</a>
+							</li>
+							<li class="nav-item">
+								<form method="POST">
+									<button class="remove-button" formaction="/logout">
+										<a class="nav-link active" aria-current="page">Logout</a>
+									</button>
+								</form>
+							</li>
+						{{else}}
+							<li class="nav-item">
+								<a class="nav-link active" aria-current="page" href="/login">Login</a>
+							</li>
+							<li class="nav-item">
+								<a class="nav-link active" aria-current="page" href="/register">Register</a>
+							</li>
+						{{/if}}
 					</ul>
 					<!-- Nav Search Form-->
 					<form class="d-flex" action="/games">

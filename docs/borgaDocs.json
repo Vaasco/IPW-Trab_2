@@ -863,6 +863,10 @@
                                 "description": "Group's description.",
                                 "example": "Jogos que já joguei"
                             },
+                            "id": {
+                                "type": "string",
+                                "example": "8923849234"
+                            },
                             "games":{
                                 "type": "array",
                                 "items":{
@@ -870,7 +874,7 @@
                                     "properties":{
                                         "id": {
                                             "type": "string",
-                                            "example": "12312314"
+                                            "example": "1FSfa34As"
                                         },
                                         "name": {
                                             "type": "string",
