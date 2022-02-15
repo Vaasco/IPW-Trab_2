@@ -149,7 +149,7 @@ module.exports = function (es_spec, guest){
         }
     }
 
-    /**
+    /**     
      * Adds a game to the intern memory collection.
      * @param game to add to the collection.
      * @returns true if the game was added to the collection succesfully.

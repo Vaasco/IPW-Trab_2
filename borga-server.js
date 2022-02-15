@@ -14,8 +14,8 @@ passport.deserializeUser((userInfo, done) => {
 module.exports = function (es_spec, guest){
 
     const games_data = require('./borga-games-data');
-    //const data_mem = require('./borga-data-mem')(guest)
-    const data_mem = require('./borga-db')(es_spec, guest)
+    const data_mem = require('./borga-data-mem')(guest)
+    //const data_mem = require('./borga-db')(es_spec, guest)
     
     const services = require('./borga-services')(games_data, data_mem)
 

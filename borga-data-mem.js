@@ -10,16 +10,10 @@ module.exports = function (guest){
 
     /**Object with the tokens and their respective user.*/
     const tokens = { 
-        'abd331d7-fd48-4054-9b73-7b7edf2941a6': 'costakilapada',
-        '255f06fe-46b9-44b9-ba5a-6acdf72347b9': 'vascao',
-        '84ea5f5b-8e03-421b-8edb-16a0ae89eb7f': 'jsmagician',
-        [guest.token]: guest.user     
+        [guest.token]: {userName: guest.user, password: guest.password, token: guest.token}     
     }
 
     const users = {
-        'costakilapada': {groups: {}},
-        'jsmagician': {groups: {}},
-        'vascao': {groups: {}},
         [guest.user]: {groups: {}}
     }
 
@@ -35,12 +29,12 @@ module.exports = function (guest){
      * @param name to link to the token.
      * @returns true if the new user was created succesfully.
      */
-    async function createNewUser(name){
+    async function createNewUser(name, password){
         let success = false
         const userExists = await hasUser(name)
         if(userExists) return {success}
         const token = crypto.randomUUID()
-        tokens[token] = name 
+        tokens[token] = {userName: name, password, token} 
         users[name] = { groups: {}}
         success = true
         return {success , token}
@@ -52,11 +46,11 @@ module.exports = function (guest){
      * @returns the user name
      */
      async function tokenToUsername(token) {
-        return tokens[token];
+        return tokens[token].userName;
     }
 
     /**
-     * Cheks if already exists a user with {name} in {users}
+     * Checks if already exists a user with {name} in {users}
      */
     async function hasUser(name){
         return !!users[name]
@@ -88,7 +82,9 @@ module.exports = function (guest){
      * @param gameName of the game to check. 
      * @returns true if game exists
      */
-    async function hasGameByID(gameID){ return !!getGame(gameID) }
+    async function hasGameByID(gameID){ 
+        return !!gameCollection.games[gameID] 
+    }
 
     /**
      * Checks if there is a game identified by {gameName} in game's collection.
@@ -154,7 +150,7 @@ module.exports = function (guest){
         const userToEdit = users[userName]
         const groupToEdit = userToEdit.groups[groupID]
         const desc = newDescription || groupToEdit.description 
-        const newName = givenName || groupToEdit.groupName
+        const newName = givenName || groupToEdit.name
         groupToEdit.name = newName
         groupToEdit.description = desc
         const returnCopy = {...groupToEdit}  
@@ -171,7 +167,6 @@ module.exports = function (guest){
      */
     async function addGameToGroup(groupID, gameID, userName){
         const groupNeeded = users[userName].groups[groupID]
-        if(groupNeeded.games.includes(gameID)) return {success: false}
         groupNeeded.games.push(gameID)
         const gameToAdd = await getGame(gameID)
         return {success: true, responseObject: {groupName: groupNeeded.name ,gameName: gameToAdd.name}}
@@ -192,6 +187,7 @@ module.exports = function (guest){
             return {id, name}            
         })
         groupCopy.games = await Promise.all(gamesPromise)
+        groupCopy.id = groupID
         return groupCopy
     }
 
@@ -223,6 +219,21 @@ module.exports = function (guest){
         return {success: true, responseObject: {groupName: group.name, gameName: gameRemoved.name}}
     } 
 
+
+    /**
+     * 
+     */
+    async function getUser(userName){
+        return Object.values(tokens).find(it => it.userName === userName)
+    }
+
+
+    /**
+     * 
+     */
+    async function isGameInGroup(gameID, groupID, userName){
+        return users[userName].groups[groupID].games.includes(gameID)
+    }
     
 
     /**
@@ -232,10 +243,6 @@ module.exports = function (guest){
         Object.values(users).forEach(user => {
             user.groups = {};
         });
-    }
-
-    async function collectionIsEmpty(){
-        return Object.entries(gameCollection.games).length === 0
     }
 
     async function saveMechanics(mechanics){
@@ -272,7 +279,10 @@ module.exports = function (guest){
         deleteGroup: deleteGroup,
         hasGroup: hasGroup,
         hasGame: hasGameByID,
+        hasUser: hasUser,
         hasGameByName: hasGameByName,
+        isGameInGroup: isGameInGroup,
+        getUser: getUser,
         getGame: getGame,
         addGameToCollection: addGameToCollection,
         addGameToGroup: addGameToGroup,
@@ -281,7 +291,6 @@ module.exports = function (guest){
         tokenToUsername: tokenToUsername,
         saveCategories: saveCategories,
         saveMechanics: saveMechanics,
-        collectionIsEmpty: collectionIsEmpty,
         getMechanics: getMechanics,
         getCategories: getCategories,
         reset: reset  

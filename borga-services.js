@@ -207,14 +207,14 @@ module.exports = (games_data, data_mem) => {
         if(!groupID) throw errors.MISSING_PARAM(MISSING_GROUP_ID) 
         if(!gameID) throw errors.MISSING_PARAM(MISSING_GAME_ID)
 
-        const user = await getUsername(token)
-        await requireGroup(groupID, user)
+        const userName = await getUsername(token)
+        await requireGroup(groupID, userName)
 
         const gameExists = await data_mem.hasGame(gameID)
         if(!gameExists) throw errors.INVALID_PARAM(GAME_NOT_IN_COLLECTION)
-        const gameInGroup = await data_mem.isGameInGroup(gameID, groupID, user)
+        const gameInGroup = await data_mem.isGameInGroup(gameID, groupID, userName)
         if(gameInGroup) throw errors.INVALID_PARAM(GAME_ALREADY_IN_GROUP)
-        const result = await data_mem.addGameToGroup(groupID, gameID, user)
+        const result = await data_mem.addGameToGroup(groupID, gameID, userName)
         if(!result.success) throw errors.INVALID_PARAM(GAME_ALREADY_IN_GROUP)
 
         return result
