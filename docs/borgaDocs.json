@@ -10,6 +10,10 @@
         {
             "url": "http://localhost:8888/api",
             "description": "Local Server"
+        },
+        {
+            "url": "http://isel-ipw-2122-1-g13d2.herokuapp.com/api",
+            "description": "Production Server"
         }
     ],
     "tags":[

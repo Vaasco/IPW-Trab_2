@@ -13,7 +13,6 @@ module.exports = function (services) {
 		return req.isAuthenticated()
 	}
 
-
 	function getHomepage(req, res) {
 		const isLogged = isLoggedIn(req)
 		const userName = isLogged ? req.user.userName : ""
@@ -64,7 +63,7 @@ module.exports = function (services) {
 		res.render("errors", { error , isLoggedIn: isLoggedIn(req)})
 	}
 
-	async function findInBorgaGames(req, res){
+	async function searchGameByName(req, res){
 		const header = 'Find Game Result'
 		const gameName = req.query.game
 		try{
@@ -156,8 +155,6 @@ module.exports = function (services) {
 		}
 	}
 
-	
-
 	async function getGroupEdition(req, res){
 		try {
 			res.render('group_edition', {groupID: req.params.groupID, isLoggedIn: isLoggedIn(req)})
@@ -184,19 +181,19 @@ module.exports = function (services) {
 	router.post('/register', doRegister);
 
 	// Search page	
-	router.get('/games', findInBorgaGames) // DONE
-	router.get('/popular', getMostPopular) // DONE
-	router.get('/groups', getGroups) // DONE
-	router.post('/groups', createGroup) // DONE
+	router.get('/games', searchGameByName)
+	router.get('/popular', getMostPopular) 
+	router.get('/groups', getGroups) 
+	router.post('/groups', createGroup) 
 	
-	router.get('/games/:gameID', getGameDetails) // DONE
+	router.get('/games/:gameID', getGameDetails) 
 	
-	router.post('/groups/selection', getGroupSelect) // DONE
-	router.post('/groups/:gameID', saveGame) // DONE
+	router.post('/groups/selection', getGroupSelect) 
+	router.post('/groups/:gameID', saveGame) 
 	
-	router.get('/groups/:groupID', getMyGroupDetails) // DONE
+	router.get('/groups/:groupID', getMyGroupDetails) 
 
-	router.get('/groups/edition/:groupID', getGroupEdition) // DONE
+	router.get('/groups/edition/:groupID', getGroupEdition) 
 
 	return router
 }

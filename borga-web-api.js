@@ -254,25 +254,25 @@ module.exports = function (services){
     router.use(express.json());
     router.use('/my', extractToken);
          
-    router.get("/games/popular", getMostPopularGames) // DONE
-    router.get("/games", searchGameByName) // DONE
-    router.get("/games/:gameID", getGameDetails) // DONE
-
-    router.post("/register", createNewUser) // DONE  
+    
+    router.get("/games", searchGameByName)
+    router.get("/games/popular", getMostPopularGames)
+    router.get("/games/:gameID", getGameDetails)
+    router.post("/register", createNewUser) 
 
     // Resource /my/groups
     router.get("/my/groups", getMyGroups)
     router.post("/my/groups", addGroup)
 
-    router.put("/my/groups/:groupID", editGroup) // DONE
+    router.put("/my/groups/:groupID", editGroup)
 
     // Resource /my/groups/<groupID>
-    router.get("/my/groups/:groupID", getGroupDetails) // DONE
-    router.delete("/my/groups/:groupID", deleteGroupById) // DONE
+    router.get("/my/groups/:groupID", getGroupDetails)
+    router.delete("/my/groups/:groupID", deleteGroupById)
     
 
     // Resource /my/groups/<groupID>/<gameID>
-    router.delete("/my/groups/:groupID/:gameID", deleteGameFromGroup) // DONE
+    router.delete("/my/groups/:groupID/:gameID", deleteGameFromGroup)
     router.post("/my/groups/:groupID/:gameID", addGameByID)
 
     return router
