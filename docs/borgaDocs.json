@@ -964,13 +964,17 @@
                     }
                 }
             },
-            "UserName":{
+            "User":{
                 "type": "object",
                 "description": "Name of the user to register",
                 "properties":{
                     "userName": {
                         "type": "string",
-                        "example": "User"
+                        "example": "user"
+                    },
+                    "password": {
+                        "type": "string",
+                        "example": "userpass"
                     }
                 }
             },
