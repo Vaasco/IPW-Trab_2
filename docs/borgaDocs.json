@@ -12,7 +12,7 @@
             "description": "Local Server"
         },
         {
-            "url": "http://isel-ipw-2122-1-g13d2.herokuapp.com/api",
+            "url": "https://isel-ipw-2122-1-g13d2.herokuapp.com/api",
             "description": "Production Server"
         }
     ],
