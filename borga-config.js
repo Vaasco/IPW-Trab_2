@@ -10,5 +10,5 @@ module.exports = {
 		token: 'fz3zMebxQXybYskc567j5w'
 	},
 
-	DB_MODE: "REMOTE"
+	DB_MODE: "LOCAL"
 }
