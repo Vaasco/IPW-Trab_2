@@ -62,7 +62,7 @@
                 "tags": [
                     "Global"
                 ],
-                "summary": "Gets 10 games based on this search.",
+                "summary": "Gets 20 games based on this search.",
                 "parameters": [
                     {
                         "name": "gameName",
