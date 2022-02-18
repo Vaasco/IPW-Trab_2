@@ -964,7 +964,7 @@
                     }
                 }
             },
-            "User":{
+            "UserName":{
                 "type": "object",
                 "description": "Name of the user to register",
                 "properties":{
