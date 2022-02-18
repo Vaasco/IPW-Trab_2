@@ -12,7 +12,7 @@ const es_spec = {
     prefix: 'prod'
 }
 
-const serverResponse = require('./borga-server')(es_spec, config.guest)
+const serverResponse = require('./borga-server')(es_spec, config.guest, config.DB_MODE)
 
 const app = serverResponse.app
 

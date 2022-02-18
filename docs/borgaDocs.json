@@ -960,7 +960,7 @@
                     },
                     "token": {
                         "type": "string",
-                        "example": "8e3e3f01-ba66-46ce-ba1a-88a6abad4d6d"
+                        "example": "8e3e3f01-ba66-46ce-ba1a-88a6abad4d6d" 
                     }
                 }
             },

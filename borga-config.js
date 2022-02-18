@@ -8,6 +8,7 @@ module.exports = {
 		user : 'guest',
 		password: '123456',
 		token: 'fz3zMebxQXybYskc567j5w'
-	}
-	
+	},
+
+	DB_MODE: "REMOTE"
 }

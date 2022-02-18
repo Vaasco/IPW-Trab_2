@@ -9,19 +9,23 @@ const errors = require('./borga-errors.js');
 module.exports = function (guest){
 
     /**Object with the tokens and their respective user.*/
-    const tokens = { 
-        [guest.token]: {userName: guest.user, password: guest.password, token: guest.token}     
-    }
-
-    const users = {
-        [guest.user]: {groups: {}}
-    }
+    const tokens = {}
+    /**Object with the users and their respective groups.*/
+    const users = {}
 
     /**Object with the requested games.*/
     const gameCollection = {games: {}}  
 
     function generateRandomId(){
         return Math.floor(Math.random() * Math.floor(Math.random() * Date.now())).toString()
+    }
+
+    /**
+     * Creates the guest user at the star of the application
+     */
+    function createGuestIndex(){
+        tokens[guest.token] = {userName: guest.user, password: guest.password, token: guest.token}
+        users[guest.user] = {groups: {}}
     }
 
     /**
@@ -277,6 +281,7 @@ module.exports = function (guest){
         editGroup: editGroup,
         groupDetails: groupDetails,
         deleteGroup: deleteGroup,
+        createGuestIndex: createGuestIndex,
         hasGroup: hasGroup,
         hasGame: hasGameByID,
         hasUser: hasUser,
